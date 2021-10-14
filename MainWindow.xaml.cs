@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media.Media3D;
 
 namespace WpfApp1
 {
@@ -24,6 +25,7 @@ namespace WpfApp1
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
+            Righe.Clear();
             var t = TextBox1.Text;
             var lines = Regex.Split(t, @"(\n|\r)+").Select(o => o.Trim()).Where(o => !string.IsNullOrWhiteSpace(o));
 

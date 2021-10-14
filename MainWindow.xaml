@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:WpfApp1"
+        xmlns:local="clr-namespace:WpfApp1" xmlns:controls="clr-namespace:Telerik.Windows.Controls;assembly=Telerik.Windows.Controls.GridView"
         mc:Ignorable="d"
         Title="MainWindow" Height="1450" Width="1600">
 	<Grid>
@@ -23,68 +23,9 @@
 		</Canvas>
 		<Grid Grid.Row="1">
 
-			<ListBox ItemsSource="{Binding Righe}"
-         SelectedItem="{Binding SelectedRow, Mode=TwoWay}">
+            <controls:RadGridView ItemsSource="{Binding Righe}" AutoGenerateColumns="True" SelectionUnit="Mixed" SelectionMode="Extended"/>
 
-				<!--//Use ItemTemplate to set how item looks "inside"
-				//I'll leave design details for you-->
-				<ListBox.ItemTemplate>
-					<DataTemplate DataType="local:RigaDivisaPerPersone">
-						<StackPanel Orientation="Horizontal">
-							<CheckBox Width="20" IsChecked="{Binding Persona1Checked}"/>
-							<TextBlock Text="{Binding Persona1}" Width="500"/>
-
-							<CheckBox Width="20" IsChecked="{Binding Persona2Checked}"/>
-							<TextBlock Text="{Binding Persona2}" Width="500"/>
-
-							<CheckBox Width="20" IsChecked="{Binding Persona3Checked}"/>
-							<TextBlock Text="{Binding Persona3}" Width="500"/>
-						</StackPanel>
-					</DataTemplate>
-				</ListBox.ItemTemplate>
-
-				<!--//ItemsPanel defines container for items. It can be StackPanel, Wrapanel, Grid, etc--><!--
-				<ListBox.ItemsPanel>
-					<ItemsPanelTemplate>
-						
-							<StackPanel IsItemsHost="True" Orientation="Horizontal"/>
-						
-					</ItemsPanelTemplate>
-				</ListBox.ItemsPanel>
-
-				<ListBox.ItemContainerStyle>
-					<Style TargetType="ListBoxItem">
-						<Setter Property="Template">
-							<Setter.Value>
-								<ControlTemplate TargetType="{x:Type ListBoxItem}">
-									--><!--//You use this place to design how container normally looks like--><!--
-									<Border Background="White">
-										--><!--//DataTemplate defined above is placed in ContentPresenter--><!--
-										<ContentPresenter />
-									</Border>
-								</ControlTemplate>
-							</Setter.Value>
-						</Setter>
-						<Style.Triggers>
-							--><!--//Here we catch "IsSelected" event and re-design our template to visually reflect "selected"--><!--
-							<Trigger Property="IsSelected" Value="true">
-								<Setter Property="Template">
-									<Setter.Value>
-										<ControlTemplate TargetType="{x:Type ListBoxItem}">
-											<Border Background="Gray">
-												<ContentPresenter />
-											</Border>
-										</ControlTemplate>
-									</Setter.Value>
-								</Setter>
-							</Trigger>
-						</Style.Triggers>
-					</Style>
-				</ListBox.ItemContainerStyle>-->
-
-			</ListBox>
-
-			<!--<Grid.ColumnDefinitions>
+            <!--<Grid.ColumnDefinitions>
 				<ColumnDefinition />
 				<ColumnDefinition />
 				<ColumnDefinition />
