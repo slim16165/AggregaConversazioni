@@ -4,8 +4,6 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Media.Media3D;
 
 namespace WpfApp1
 {
@@ -23,63 +21,92 @@ namespace WpfApp1
         public ObservableCollection<RigaDivisaPerPersone> Righe { get; set; } =
             new ObservableCollection<RigaDivisaPerPersone>();
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private void MessengerButton_Click(object sender, RoutedEventArgs e)
+        {
+            AnalizzaMessenger();
+        }
+
+        private void EvernoteButton_Click(object sender, RoutedEventArgs e)
+        {
+            AnalizzaEvernote();
+        }
+
+        private void FacebookButton_Click(object sender, RoutedEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void InstagramButton_Click(object sender, RoutedEventArgs e)
+        {
+            AnalizzaInstagram();
+        }
+
+        private void AnalizzaMessenger()
         {
             Righe.Clear();
-            var t = TextBox1.Text;
-            var lines = Regex.Split(t, @"(\n|\r)+").Select(o => o.Trim()).Where(o => !string.IsNullOrWhiteSpace(o));
+            var text = TextBox1.Text;
 
-            var actors = new[] { "Persona1", "Persona2", "Persona3" };
-            Dictionary<string, List<string>> dict = new Dictionary<string, List<string>>();
-            //var output = new Dictionary<string, TextBox>();
-            //output.Add(actors[0], TextBox2);
-            //output.Add(actors[1], TextBox3);
-            //output.Add(actors[2], TextBox4);
-            //foreach (var pair in output)
-            //{
-            //    pair.Value.Text = "";
-            //}
+            List<string> speakers;
+            var (outputText, k) = Parser.AnalizzaMessenger2(text);
 
-            var output = new Dictionary<string, Action<RigaDivisaPerPersone, string>>
+            foreach (string speaker in speakers)
             {
-                { actors[0], (p, v) => p.Persona1 = v },
-                { actors[1], (p, v) => p.Persona2 = v},
-                { actors[2], (p, v) => p.Persona3 = v}
-            };
+                Speakers.Items.Add(speaker);
+            }
 
-            string currentBin = actors[0]; //Se non so chi sta parlando per primo scelgo a caso
+            TextBox1.Text = outputText;
+        }
 
-            foreach (string curLine in lines)
+        private static void AnalizzaInstagram()
+        {
+            Righe.Clear();
+            var text = TextBox1.Text;
+            var lines = Regex.Split(text, @"(\n|\r)+").Select(o => o.Trim());
+            //Le regex sono le seguenti: ^(You sent|Stephanie replied to you|Original message:|Stephanie Frogs|Stephanie|)
+
+
+            var speakers = Parser.IdentifySpeakers(lines);
+
+            foreach (string speaker in speakers)
             {
-                //la riga corrente è il nome di una persona che parla
-                if (actors.Contains(curLine))
-                {
-                    //if (output.ContainsKey(currentBin))
-                    {
-                        //output[currentBin].AppendText("\n\n");
+                Speakers.Items.Add(speaker);
+            }
 
-                    }
-                    currentBin = curLine;
-                }
-                else
-                {
-                    if (!dict.ContainsKey(currentBin) || dict[currentBin] == null)
-                        dict[currentBin] = new List<string>();
-                    else
-                        dict[currentBin].Add(curLine);
+            string shortSpeakerName;
+            string longSpeakerName = "Stephanie Frogs";
+            //shortSpeakerName = "Julia";
+            longSpeakerName = "Julia Margini";
+            longSpeakerName = "Francesco Arnaldi";
+            longSpeakerName = "Sara Stefanile";
+            shortSpeakerName = longSpeakerName.Split(' ').First();
 
-                    //output[currentBin].AppendText(curLine);
+            (string search, string replace) regexGiornoEOra = 
+                (search: @"(Lunedì|Martedì|Mercoledì|Giovedì|Sabato|Domenica) \d{1,2}:\d{2}", replace: "");
+          
+            (string search, string replace) regexUsernameInterloc = 
+                (search: "^Immagine del profilo di ([^ ]+)$", replace: "$1: ");
 
-                    var row = new RigaDivisaPerPersone();
-                    var function = output[currentBin];
+            text = Regex.Replace(text, regexGiornoEOra.search+"[\n\r]+", regexGiornoEOra.replace, RegexOptions.IgnoreCase | RegexOptions.Multiline);
 
-                    function(row, curLine);
+            text = Regex.Replace(text, $"{shortSpeakerName}[\n\r]+{longSpeakerName}[\n\r]+", "Lei: ", RegexOptions.IgnoreCase | RegexOptions.Multiline);
+            text = Regex.Replace(text, @"You sent[\n\r]+", "Io: ", RegexOptions.IgnoreCase | RegexOptions.Multiline);
+            text = Regex.Replace(text, $"{shortSpeakerName} replied to you[\n\r]+", "Io: ", RegexOptions.IgnoreCase | RegexOptions.Multiline);
+            text = Regex.Replace(text, $"You replied to {shortSpeakerName}[\n\r]+", "Io: ", RegexOptions.IgnoreCase | RegexOptions.Multiline);
+            text = Regex.Replace(text, $"{shortSpeakerName}[\n\r]+", "Lei: ", RegexOptions.IgnoreCase | RegexOptions.Multiline);
+            text = Regex.Replace(text, $"{longSpeakerName}[\n\r]+", "Lei: ", RegexOptions.IgnoreCase | RegexOptions.Multiline);
 
-                    ////if(currentBin)
-                    //var k2 = new Func<RigaDivisaPerPersone, string, object>((p, v) => p.Persona1 = v);
-                    //var k3 = new Action<RigaDivisaPerPersone, string>((p, v) => p.Persona1 = v);
+            //elimino le ore 
+            text = Regex.Replace(text, @"^\d{1,2}:\d{2} [ap]m[\n\r]", "", RegexOptions.IgnoreCase | RegexOptions.Multiline);
 
-                    Righe.Add(row);
+            Regex regexObj2 = new Regex(@"^(Io|Lei): (.*)\n\k<1>: ", RegexOptions.IgnoreCase | RegexOptions.Multiline);
+            for (int i = 0; i < 10; i++)
+            {
+                text = regexObj2.Replace(text, @"$1: $2 ");
+            }
+
+            TextBox1.Text = text;
+
+            
                 }
             }
         }
