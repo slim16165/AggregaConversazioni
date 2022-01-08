@@ -61,6 +61,9 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Parser.cs" />
+    <Compile Include="ParserEvernote.cs" />
+    <Compile Include="ParserMessenger.cs" />
+    <Compile Include="ParserInstagram.cs" />
     <Compile Include="RigaDivisaPerPersone.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>

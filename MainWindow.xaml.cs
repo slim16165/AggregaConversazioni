@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows;
+using AggregaConversazioni;
 
 namespace WpfApp1
 {
@@ -46,8 +47,7 @@ namespace WpfApp1
             Righe.Clear();
             var text = TextBox1.Text;
 
-            List<string> speakers;
-            var (outputText, k) = Parser.AnalizzaMessenger2(text);
+            var (outputText, k, speakers) = ParserMessenger.AnalizzaMessenger(text);
 
             foreach (string speaker in speakers)
             {
@@ -57,58 +57,29 @@ namespace WpfApp1
             TextBox1.Text = outputText;
         }
 
-        private static void AnalizzaInstagram()
+        private void AnalizzaInstagram()
         {
             Righe.Clear();
             var text = TextBox1.Text;
-            var lines = Regex.Split(text, @"(\n|\r)+").Select(o => o.Trim());
-            //Le regex sono le seguenti: ^(You sent|Stephanie replied to you|Original message:|Stephanie Frogs|Stephanie|)
 
-
-            var speakers = Parser.IdentifySpeakers(lines);
+            var (outputText, k, speakers) = ParserInstagram.AnalizzaInstagram(text);
 
             foreach (string speaker in speakers)
             {
                 Speakers.Items.Add(speaker);
             }
 
-            string shortSpeakerName;
-            string longSpeakerName = "Stephanie Frogs";
-            //shortSpeakerName = "Julia";
-            longSpeakerName = "Julia Margini";
-            longSpeakerName = "Francesco Arnaldi";
-            longSpeakerName = "Sara Stefanile";
-            shortSpeakerName = longSpeakerName.Split(' ').First();
+            TextBox1.Text = outputText;
+        }
 
-            (string search, string replace) regexGiornoEOra = 
-                (search: @"(Lunedì|Martedì|Mercoledì|Giovedì|Sabato|Domenica) \d{1,2}:\d{2}", replace: "");
-          
-            (string search, string replace) regexUsernameInterloc = 
-                (search: "^Immagine del profilo di ([^ ]+)$", replace: "$1: ");
+        private void AnalizzaEvernote()
+        {
+            Righe.Clear();
+            var text = TextBox1.Text;
 
-            text = Regex.Replace(text, regexGiornoEOra.search+"[\n\r]+", regexGiornoEOra.replace, RegexOptions.IgnoreCase | RegexOptions.Multiline);
+            var outputText = ParserEvernote.AnalizzaEvernote(text);
 
-            text = Regex.Replace(text, $"{shortSpeakerName}[\n\r]+{longSpeakerName}[\n\r]+", "Lei: ", RegexOptions.IgnoreCase | RegexOptions.Multiline);
-            text = Regex.Replace(text, @"You sent[\n\r]+", "Io: ", RegexOptions.IgnoreCase | RegexOptions.Multiline);
-            text = Regex.Replace(text, $"{shortSpeakerName} replied to you[\n\r]+", "Io: ", RegexOptions.IgnoreCase | RegexOptions.Multiline);
-            text = Regex.Replace(text, $"You replied to {shortSpeakerName}[\n\r]+", "Io: ", RegexOptions.IgnoreCase | RegexOptions.Multiline);
-            text = Regex.Replace(text, $"{shortSpeakerName}[\n\r]+", "Lei: ", RegexOptions.IgnoreCase | RegexOptions.Multiline);
-            text = Regex.Replace(text, $"{longSpeakerName}[\n\r]+", "Lei: ", RegexOptions.IgnoreCase | RegexOptions.Multiline);
-
-            //elimino le ore 
-            text = Regex.Replace(text, @"^\d{1,2}:\d{2} [ap]m[\n\r]", "", RegexOptions.IgnoreCase | RegexOptions.Multiline);
-
-            Regex regexObj2 = new Regex(@"^(Io|Lei): (.*)\n\k<1>: ", RegexOptions.IgnoreCase | RegexOptions.Multiline);
-            for (int i = 0; i < 10; i++)
-            {
-                text = regexObj2.Replace(text, @"$1: $2 ");
-            }
-
-            TextBox1.Text = text;
-
-            
-                }
-            }
+            TextBox1.Text = outputText;
         }
     }
 }
