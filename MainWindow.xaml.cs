@@ -24,7 +24,21 @@ namespace WpfApp1
 
         private void MessengerButton_Click(object sender, RoutedEventArgs e)
         {
-            AnalizzaMessenger();
+            Parse(ParserMessenger.AnalizzaMessenger);
+        }
+
+        private void InstagramButton_Click(object sender, RoutedEventArgs e)
+        {
+            Parse(ParserInstagram.AnalizzaInstagram);
+        }
+
+        private void TelegramButton_Click(object sender, RoutedEventArgs e)
+        {
+            Parse(ParserTelegram.AnalizzaTelegram);
+        }
+        private void IoLeiCiclico_Click(object sender, RoutedEventArgs e)
+        {
+            Parse(Parser.ParseIo_LeiCiclico2);
         }
 
         private void EvernoteButton_Click(object sender, RoutedEventArgs e)
@@ -37,34 +51,14 @@ namespace WpfApp1
             throw new NotImplementedException();
         }
 
-        private void InstagramButton_Click(object sender, RoutedEventArgs e)
-        {
-            AnalizzaInstagram();
-        }
-
-        private void AnalizzaMessenger()
+        private void Parse(Func<string, (string text, IEnumerable<RigaDivisaPerPersone> k, List<string> speakers)> analizza)
         {
             Righe.Clear();
             var text = TextBox1.Text;
 
-            var (outputText, k, speakers) = ParserMessenger.AnalizzaMessenger(text);
+            var (outputText, k, speakers) = analizza(text);
 
-            foreach (string speaker in speakers)
-            {
-                Speakers.Items.Add(speaker);
-            }
-
-            TextBox1.Text = outputText;
-        }
-
-        private void AnalizzaInstagram()
-        {
-            Righe.Clear();
-            var text = TextBox1.Text;
-
-            var (outputText, k, speakers) = ParserInstagram.AnalizzaInstagram(text);
-
-            foreach (string speaker in speakers)
+            foreach (string speaker in speakers ?? new List<string>())
             {
                 Speakers.Items.Add(speaker);
             }
@@ -81,5 +75,7 @@ namespace WpfApp1
 
             TextBox1.Text = outputText;
         }
+
+        
     }
 }

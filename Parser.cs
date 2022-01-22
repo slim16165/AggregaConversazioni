@@ -2,11 +2,40 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using AggregaConversazioni;
 using WpfApp1;
 
 internal class Parser
 {
-    
+    public static List<string> IdentifySpeakers(IEnumerable<string> lines, string search)
+    {
+        var reg = ExecuteRegex(search);
+        var k = lines.GetCapturingGroup(reg).DistinctNotEmpty();
+
+        //Metodo alternativo, serco le righe ripetute più volte
+        var mostFreqLines = GetMostFreqLines(lines);
+
+        return k;
+    }
+
+    private static List<string> GetMostFreqLines(IEnumerable<string> lines)
+    {
+        return lines.GroupBy(s => s)
+            .Select(group => new {
+                Text = @group.Key,
+                Count = @group.Count()
+            })
+            .Where(l => l.Count != 1
+                        && !string.IsNullOrWhiteSpace(l.Text)
+                        && l.Text.Length < 20)
+            .OrderByDescending(x => x.Count)
+            .Select(s => s.Text).ToList();
+    }
+
+    internal static Regex ExecuteRegex(string search)
+    {
+        return new Regex(search, RegexOptions.IgnoreCase | RegexOptions.Multiline);
+    }
 
     protected static IEnumerable<RigaDivisaPerPersone> IdentifySpeaker2(IEnumerable<string> lines)
     {
@@ -60,27 +89,41 @@ internal class Parser
         }
     }
 
-    
-
-    public static List<string> IdentifySpeakers(IEnumerable<string> lines)
+    protected static string ApplyRegex(string text, List<(string @from, string to)> regexes)
     {
-        //^(You sent|Stephanie replied to you|Original message:|Stephanie Frogs|Stephanie|)
-            
-        //Cerco quelli con replied to you
-        Regex regexObj = new Regex("^(.+?) replied to you", RegexOptions.IgnoreCase | RegexOptions.Multiline);
-        var speakers = lines.Select( subjectString => regexObj.Match(subjectString).Groups[1].Value).Where(s=> !string.IsNullOrWhiteSpace(s)).Distinct().ToList();
+        foreach (var reg in regexes)
+        {
+            text = Regex.Replace(text, reg.@from + "\n?", reg.to,
+                RegexOptions.IgnoreCase | RegexOptions.Singleline | RegexOptions.Multiline);
+        }
 
-        //Cerco le righe ripetute più volte
-        var mostFreqLines = lines.GroupBy(s => s)
-            .Select(group => new {
-                Text = @group.Key,
-                Count = @group.Count()
-            })
-            .Where(l => l.Count != 1 
-                        && !string.IsNullOrWhiteSpace(l.Text)
-                        && l.Text.Length < 20)
-            .OrderByDescending(x => x.Count).ToList();
+        return text;
+    }
 
-        return mostFreqLines.Select(s =>s.Text).ToList();
+    protected internal static string ParseIo_LeiCiclico(string text)
+    {
+        //versione vecchia
+        //Regex regexObj2 = new Regex(@"^(Io|Lei): ([^:]+?)[\n\s\r]+\k<1>: ", RegexOptions.IgnoreCase | RegexOptions.Singleline | RegexOptions.Multiline);
+        Regex regexObj2 = new Regex(@"^(Io|Lei): ((?:(?!^(Io|Lei)).)+?)[\n\s\r]+\k<1>: ", RegexOptions.IgnoreCase | RegexOptions.Singleline | RegexOptions.Multiline);
+
+        string prima = text, dopo;
+
+
+        bool hasChanged;
+        do
+        {
+            dopo = regexObj2.Replace(prima, @"$1: $2 ");
+            hasChanged = prima != dopo;
+            prima = dopo;
+        } while (hasChanged);
+
+        return dopo;
+    }
+
+    public static (string text, IEnumerable<RigaDivisaPerPersone> k, List<string> speakers) ParseIo_LeiCiclico2(string text)
+    {
+        text = ParseIo_LeiCiclico(text);
+
+        return (text, null, null);
     }
 }

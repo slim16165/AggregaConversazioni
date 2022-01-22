@@ -21,7 +21,9 @@
                 <Button Content="Facebook" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Click="FacebookButton_Click" Margin="5"/>
                 <Button Content="Messenger" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Click="MessengerButton_Click" Margin="5"/>
                 <Button Content="Instagram" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Click="InstagramButton_Click" Margin="5"/>
+                <Button Content="Telegram" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Click="TelegramButton_Click" Margin="5"/>
                 <Button Content="Evernote" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Click="EvernoteButton_Click" Margin="5"/>
+                <Button Content="Io/Lei ciclico" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Click="IoLeiCiclico_Click" Margin="5"/>
             </StackPanel>
             
             <ListBox  Name="Speakers" Width="300" Height="200" Canvas.Left="710" Canvas.Top="50"/>

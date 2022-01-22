@@ -60,8 +60,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Extension.cs" />
     <Compile Include="Parser.cs" />
     <Compile Include="ParserEvernote.cs" />
+    <Compile Include="ParserTelegram.cs" />
     <Compile Include="ParserMessenger.cs" />
     <Compile Include="ParserInstagram.cs" />
     <Compile Include="RigaDivisaPerPersone.cs" />
