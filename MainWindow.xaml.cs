@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text.RegularExpressions;
 using System.Windows;
-using AggregaConversazioni;
 
-namespace WpfApp1
+namespace AggregaConversazioni
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
@@ -16,7 +13,7 @@ namespace WpfApp1
         public MainWindow()
         {
             InitializeComponent();
-            this.DataContext = this;
+            DataContext = this;
         }
 
         public ObservableCollection<RigaDivisaPerPersone> Righe { get; set; } =
@@ -24,18 +21,22 @@ namespace WpfApp1
 
         private void MessengerButton_Click(object sender, RoutedEventArgs e)
         {
-            Parse(ParserMessenger.AnalizzaMessenger);
+            Parser p = new ParserMessenger();
+            Parse(p);
         }
 
         private void InstagramButton_Click(object sender, RoutedEventArgs e)
         {
-            Parse(ParserInstagram.AnalizzaInstagram);
+            Parser p = new ParserInstagram();
+            Parse(p);
         }
 
         private void TelegramButton_Click(object sender, RoutedEventArgs e)
         {
-            Parse(ParserTelegram.AnalizzaTelegram);
+            Parser p = new ParserTelegram();
+            Parse(p);
         }
+
         private void IoLeiCiclico_Click(object sender, RoutedEventArgs e)
         {
             Parse(Parser.ParseIo_LeiCiclico2);
@@ -51,10 +52,26 @@ namespace WpfApp1
             throw new NotImplementedException();
         }
 
+        private void Parse(Parser p)
+        {
+            Righe.Clear();
+            var text = Input.Text;
+
+            var (outputText, k, speakers) = p.Parse(text);
+            
+            foreach (string speaker in speakers ?? new List<string>())
+            {
+                Speakers.Items.Add(speaker);
+            }
+
+            Input.Text = outputText;
+            Output.Text = p.DebugOutputTable;
+        }
+
         private void Parse(Func<string, (string text, IEnumerable<RigaDivisaPerPersone> k, List<string> speakers)> analizza)
         {
             Righe.Clear();
-            var text = TextBox1.Text;
+            var text = Input.Text;
 
             var (outputText, k, speakers) = analizza(text);
 
@@ -63,17 +80,17 @@ namespace WpfApp1
                 Speakers.Items.Add(speaker);
             }
 
-            TextBox1.Text = outputText;
+            Input.Text = outputText;
         }
 
         private void AnalizzaEvernote()
         {
             Righe.Clear();
-            var text = TextBox1.Text;
+            var text = Input.Text;
 
             var outputText = ParserEvernote.AnalizzaEvernote(text);
 
-            TextBox1.Text = outputText;
+            Input.Text = outputText;
         }
 
         

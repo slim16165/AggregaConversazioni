@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
-VisualStudioVersion = 16.0.31729.503
+VisualStudioVersion = 16.0.33027.164
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AggregaConversazioni", "AggregaConversazioni.csproj", "{94744E85-0081-433C-AE8E-636F6BF97BB7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AggregaConversazioni", "AggregaConversazioni.csproj", "{0BC96328-9D55-4F3D-96A2-263E07B67FC0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,15 +11,15 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{94744E85-0081-433C-AE8E-636F6BF97BB7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{94744E85-0081-433C-AE8E-636F6BF97BB7}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{94744E85-0081-433C-AE8E-636F6BF97BB7}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{94744E85-0081-433C-AE8E-636F6BF97BB7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0BC96328-9D55-4F3D-96A2-263E07B67FC0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0BC96328-9D55-4F3D-96A2-263E07B67FC0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0BC96328-9D55-4F3D-96A2-263E07B67FC0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0BC96328-9D55-4F3D-96A2-263E07B67FC0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {B5CCE81C-7073-43A0-A209-95C9A0DDA0EB}
+		SolutionGuid = {AC341C0D-AC67-411F-849C-876B6F36EECB}
 	EndGlobalSection
 EndGlobal

@@ -2,128 +2,122 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using AggregaConversazioni;
-using WpfApp1;
 
-internal class Parser
+namespace AggregaConversazioni
 {
-    public static List<string> IdentifySpeakers(IEnumerable<string> lines, string search)
+    internal abstract class Parser
     {
-        var reg = ExecuteRegex(search);
-        var k = lines.GetCapturingGroup(reg).DistinctNotEmpty();
+        public string DebugOutputTable = "";
 
-        //Metodo alternativo, serco le righe ripetute più volte
-        var mostFreqLines = GetMostFreqLines(lines);
+        public abstract (string text, IEnumerable<RigaDivisaPerPersone> k, List<string> speakers) Parse(string text);
 
-        return k;
-    }
-
-    private static List<string> GetMostFreqLines(IEnumerable<string> lines)
-    {
-        return lines.GroupBy(s => s)
-            .Select(group => new {
-                Text = @group.Key,
-                Count = @group.Count()
-            })
-            .Where(l => l.Count != 1
-                        && !string.IsNullOrWhiteSpace(l.Text)
-                        && l.Text.Length < 20)
-            .OrderByDescending(x => x.Count)
-            .Select(s => s.Text).ToList();
-    }
-
-    internal static Regex ExecuteRegex(string search)
-    {
-        return new Regex(search, RegexOptions.IgnoreCase | RegexOptions.Multiline);
-    }
-
-    protected static IEnumerable<RigaDivisaPerPersone> IdentifySpeaker2(IEnumerable<string> lines)
-    {
-        //Elimino le righe vuote
-        lines = lines.Where(o => !string.IsNullOrWhiteSpace(o));
-
-        var speakers2 = new[] { "Persona1", "Persona2", "Persona3" };
-        Dictionary<string, List<string>> dict = new Dictionary<string, List<string>>();
-
-
-        var output = new Dictionary<string, Action<RigaDivisaPerPersone, string>>
+        public static List<string> IdentifySpeakers(IEnumerable<string> lines, string search)
         {
-            { speakers2[0], (p, v) => p.Persona1 = v },
-            { speakers2[1], (p, v) => p.Persona2 = v },
-            { speakers2[2], (p, v) => p.Persona3 = v }
-        };
+            var reg = ExecuteRegex(search);
+            var k = lines.GetCapturingGroup(reg).DistinctNotEmpty();
 
-        string currentBin = speakers2[0]; //Se non so chi sta parlando per primo scelgo a caso
+            //Metodo alternativo, serco le righe ripetute più volte
+            var mostFreqLines = GetMostFreqLines(lines);
 
-        foreach (string curLine in lines)
+            return k;
+        }
+
+        private static List<string> GetMostFreqLines(IEnumerable<string> lines)
         {
-            //la riga corrente è il nome di una persona che parla
-            if (speakers2.Contains(curLine))
+            return lines.GroupBy(s => s)
+                .Select(group => new {
+                    Text = @group.Key,
+                    Count = @group.Count()
+                })
+                .Where(l => l.Count != 1
+                            && !string.IsNullOrWhiteSpace(l.Text)
+                            && l.Text.Length < 20)
+                .OrderByDescending(x => x.Count)
+                .Select(s => s.Text).ToList();
+        }
+
+        internal static Regex ExecuteRegex(string search)
+        {
+            return new Regex(search, RegexOptions.IgnoreCase | RegexOptions.Multiline);
+        }
+
+        protected static IEnumerable<RigaDivisaPerPersone> IdentifySpeaker2(IEnumerable<string> lines)
+        {
+            //Elimino le righe vuote
+            lines = lines.Where(o => !string.IsNullOrWhiteSpace(o));
+
+            var speakers2 = new[] { "Persona1", "Persona2", "Persona3" };
+            Dictionary<string, List<string>> dict = new Dictionary<string, List<string>>();
+
+
+            var output = new Dictionary<string, Action<RigaDivisaPerPersone, string>>
             {
-                //if (output.ContainsKey(currentBin))
+                { speakers2[0], (p, v) => p.Persona1 = v },
+                { speakers2[1], (p, v) => p.Persona2 = v },
+                { speakers2[2], (p, v) => p.Persona3 = v }
+            };
+
+            string currentBin = speakers2[0]; //Se non so chi sta parlando per primo scelgo a caso
+
+            foreach (string curLine in lines)
+            {
+                //la riga corrente è il nome di una persona che parla
+                if (speakers2.Contains(curLine))
                 {
-                    //output[currentBin].AppendText("\n\n");
+                    //if (output.ContainsKey(currentBin))
+                    {
+                        //output[currentBin].AppendText("\n\n");
+                    }
+                    currentBin = curLine;
                 }
-                currentBin = curLine;
-            }
-            else
-            {
-                if (!dict.ContainsKey(currentBin) || dict[currentBin] == null)
-                    dict[currentBin] = new List<string>();
                 else
-                    dict[currentBin].Add(curLine);
+                {
+                    if (!dict.ContainsKey(currentBin) || dict[currentBin] == null)
+                        dict[currentBin] = new List<string>();
+                    else
+                        dict[currentBin].Add(curLine);
 
-                //output[currentBin].AppendText(curLine);
+                    //output[currentBin].AppendText(curLine);
 
-                var row = new RigaDivisaPerPersone();
-                var function = output[currentBin];
+                    var row = new RigaDivisaPerPersone();
+                    var function = output[currentBin];
 
-                function(row, curLine);
+                    function(row, curLine);
 
-                ////if(currentBin)
-                //var k2 = new Func<RigaDivisaPerPersone, string, object>((p, v) => p.Persona1 = v);
-                //var k3 = new Action<RigaDivisaPerPersone, string>((p, v) => p.Persona1 = v);
+                    ////if(currentBin)
+                    //var k2 = new Func<RigaDivisaPerPersone, string, object>((p, v) => p.Persona1 = v);
+                    //var k3 = new Action<RigaDivisaPerPersone, string>((p, v) => p.Persona1 = v);
 
-                yield return row;
+                    yield return row;
+                }
             }
         }
-    }
 
-    protected static string ApplyRegex(string text, List<(string @from, string to)> regexes)
-    {
-        foreach (var reg in regexes)
+        protected internal static string ParseIo_LeiCiclico(string text)
         {
-            text = Regex.Replace(text, reg.@from + "\n?", reg.to,
-                RegexOptions.IgnoreCase | RegexOptions.Singleline | RegexOptions.Multiline);
+            //versione vecchia
+            //Regex regexObj2 = new Regex(@"^(Io|Lei): ([^:]+?)[\n\s\r]+\k<1>: ", RegexOptions.IgnoreCase | RegexOptions.Singleline | RegexOptions.Multiline);
+            Regex regexObj2 = new Regex(@"^(Io|Lei): ((?:(?!^(Io|Lei)).)+?)[\n\s\r]+\k<1>: ", RegexOptions.IgnoreCase | RegexOptions.Singleline | RegexOptions.Multiline);
+
+            string prima = text, dopo;
+
+
+            bool hasChanged;
+            do
+            {
+                dopo = regexObj2.Replace(prima, @"$1: $2 ");
+                hasChanged = prima != dopo;
+                prima = dopo;
+            } while (hasChanged);
+
+            return dopo;
         }
 
-        return text;
-    }
-
-    protected internal static string ParseIo_LeiCiclico(string text)
-    {
-        //versione vecchia
-        //Regex regexObj2 = new Regex(@"^(Io|Lei): ([^:]+?)[\n\s\r]+\k<1>: ", RegexOptions.IgnoreCase | RegexOptions.Singleline | RegexOptions.Multiline);
-        Regex regexObj2 = new Regex(@"^(Io|Lei): ((?:(?!^(Io|Lei)).)+?)[\n\s\r]+\k<1>: ", RegexOptions.IgnoreCase | RegexOptions.Singleline | RegexOptions.Multiline);
-
-        string prima = text, dopo;
-
-
-        bool hasChanged;
-        do
+        public static (string text, IEnumerable<RigaDivisaPerPersone> k, List<string> speakers) ParseIo_LeiCiclico2(string text)
         {
-            dopo = regexObj2.Replace(prima, @"$1: $2 ");
-            hasChanged = prima != dopo;
-            prima = dopo;
-        } while (hasChanged);
+            text = ParseIo_LeiCiclico(text);
 
-        return dopo;
-    }
-
-    public static (string text, IEnumerable<RigaDivisaPerPersone> k, List<string> speakers) ParseIo_LeiCiclico2(string text)
-    {
-        text = ParseIo_LeiCiclico(text);
-
-        return (text, null, null);
+            return (text, null, null);
+        }
     }
 }

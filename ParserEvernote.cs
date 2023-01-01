@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using WpfApp1;
 
 namespace AggregaConversazioni
 {
@@ -108,6 +107,11 @@ namespace AggregaConversazioni
             }
 
             return text;
+        }
+
+        public override (string text, IEnumerable<RigaDivisaPerPersone> k, List<string> speakers) Parse(string text)
+        {
+            throw new NotImplementedException();
         }
     }
 }

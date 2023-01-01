@@ -1,19 +1,18 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using WpfApp1;
 
 namespace AggregaConversazioni
 {
-    class ParserMessenger : Parser
+    internal class ParserMessenger : Parser
     {
-        public static (string text, IEnumerable<RigaDivisaPerPersone> k, List<string> speakers) AnalizzaMessenger(string text)
+        public override (string text, IEnumerable<RigaDivisaPerPersone> k, List<string> speakers) Parse(string text)
         {
             var enumerable = Regex.Split(text, @"(\n|\r)+").Select(o => o.Trim()).ToList();
 
             //Cerco quelli con Immagine del profilo di 
             string search = "^(.+?) Immagine del profilo di";
-            var speakers = Parser.IdentifySpeakers(enumerable, search);
+            var speakers = IdentifySpeakers(enumerable, search);
 
             var lines2 = ApplyRegex(ref text, enumerable);
 
@@ -23,15 +22,11 @@ namespace AggregaConversazioni
         }
 
 
-        public static IEnumerable<string> ApplyRegex(ref string text, IEnumerable<string> lines)
+        public IEnumerable<string> ApplyRegex(ref string text, IEnumerable<string> lines)
         {
-            string shortSpeakerName;
-            string longSpeakerName = "Stephanie Frogs";
+            string longSpeakerName = "Petra Giuliani";
             //shortSpeakerName = "Julia";
-            longSpeakerName = "Julia Margini";
-            longSpeakerName = "Francesco Arnaldi";
-            longSpeakerName = "Sara Stefanile";
-            shortSpeakerName = longSpeakerName.Split(' ').First();
+            var shortSpeakerName = longSpeakerName.Split(' ').First();
 
 
             List<(string from, string to)> regexes = new List<(string @from, string to)>
@@ -48,7 +43,16 @@ namespace AggregaConversazioni
                 (@"^\d{1,2}:\d{2} [ap]m[\n\r]", ""),
             };
 
-            text = Parser.ApplyRegex(text, regexes);
+            DebugOutputTable = DebugHelper.Annotate(text, regexes);
+
+            string text1 = text;
+            foreach (var reg in regexes)
+            {
+                text1 = Regex.Replace(text1, reg.from + "\n?", reg.to,
+                    RegexOptions.IgnoreCase | RegexOptions.Singleline | RegexOptions.Multiline);
+            }
+
+            text = text1;
 
             //Parse Io/Lei ciclico
             text = ParseIo_LeiCiclico(text);

@@ -1,29 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using WpfApp1;
 
 namespace AggregaConversazioni
 {
     class ParserInstagram : Parser
     {
-        public static (string text, IEnumerable<RigaDivisaPerPersone> k, List<string> speakers) AnalizzaInstagram(string text)
-        {
-            var enumerable = Regex.Split(text, @"(\n|\r)+").Select(o => o.Trim()).ToList();
-            //Le regex sono le seguenti: ^(You sent|Stephanie replied to you|Original message:|Stephanie Frogs|Stephanie|)
-
-            //Cerco quelli con Immagine del profilo di 
-            string search = "^Immagine del profilo di (.+?)$";
-            var speakers = Parser.IdentifySpeakers(enumerable, search);
-            var speaker = speakers.Single();
-
-            var lines2 = ApplyRegex(ref text, speaker);
-
-            var k = IdentifySpeaker2(enumerable);
-
-            return (text, k, speakers);
-        }
-
         protected static string ApplyRegex(ref string text, string speaker)
         {
             List<(string from, string to)> regexes = new List<(string @from, string to)>()
@@ -42,11 +24,34 @@ namespace AggregaConversazioni
                 //@"^(Io|Lei): (.*)\n\k<1>: ", ""
             };
 
-            text = Parser.ApplyRegex(text, regexes);
+            string text1 = text;
+            foreach (var reg in regexes)
+            {
+                text1 = Regex.Replace(text1, reg.from + "\n?", reg.to,
+                    RegexOptions.IgnoreCase | RegexOptions.Singleline | RegexOptions.Multiline);
+            }
+
+            text = text1;
 
             return text;
         }
 
-        
+
+        public override (string text, IEnumerable<RigaDivisaPerPersone> k, List<string> speakers) Parse(string text)
+        {
+            var enumerable = Regex.Split(text, @"(\n|\r)+").Select(o => o.Trim()).ToList();
+            //Le regex sono le seguenti: ^(You sent|Stephanie replied to you|Original message:|Stephanie Frogs|Stephanie|)
+
+            //Cerco quelli con Immagine del profilo di 
+            string search = "^Immagine del profilo di (.+?)$";
+            var speakers = IdentifySpeakers(enumerable, search);
+            var speaker = speakers.Single();
+
+            var lines2 = ApplyRegex(ref text, speaker);
+
+            var k = IdentifySpeaker2(enumerable);
+
+            return (text, k, speakers);
+        }
     }
 }
