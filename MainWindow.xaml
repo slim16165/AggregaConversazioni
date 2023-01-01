@@ -15,7 +15,7 @@
         <Canvas Grid.Row="0">
             <StackPanel Canvas.Left="0" Orientation="Horizontal" Canvas.Top="40">
                 <TextBox x:Name="Input" TextWrapping="Wrap" AcceptsReturn="True" Width="700" Height="500" />
-                <TextBox x:Name="Output" TextWrapping="Wrap" AcceptsReturn="True" Width="700" Height="500" />
+                <TextBox x:Name="Output" TextWrapping="Wrap" AcceptsReturn="True" Width="700" Height="500" FontFamily="Courier New" />
             </StackPanel>
 
             <StackPanel Canvas.Left="710" Canvas.Top="4" Orientation="Horizontal">

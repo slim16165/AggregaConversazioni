@@ -36,12 +36,24 @@ namespace AggregaConversazioni
                 (@"You sent[\n\r]+", "Io: "),
                 ($"{shortSpeakerName} replied to you[\n\r]+", "Io: "),
                 ($"You replied to {shortSpeakerName}[\n\r]+", "Io: "),
+                ($"{shortSpeakerName} replied to themself[\n\r]+", "Lei: "),
                 ($"{shortSpeakerName}[\n\r]+", "Lei: "),
                 ($"{longSpeakerName}[\n\r]+", "Lei: "),
+
+                //elimino da Noted
+                ($"^Enter[\n\r]+", ""),
 
                 //elimino le ore 
                 (@"^\d{1,2}:\d{2} [ap]m[\n\r]", ""),
             };
+
+            //Sempre per Noted, elimino stringhe tipo queste:
+            //### You replied to Petra
+            //### You sent
+            //### Petra replied to you
+            //### Petra replied to themself
+            //### Petra
+            regexes = regexes.Select(r => ("^### " + r.from, r.to)).Union(regexes).ToList();
 
             DebugOutputTable = DebugHelper.Annotate(text, regexes);
 
