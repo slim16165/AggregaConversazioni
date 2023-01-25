@@ -25,9 +25,9 @@ namespace AggregaConversazioni
             };
 
             string text1 = text;
-            foreach (var reg in regexes)
+            foreach (var (from, to) in regexes)
             {
-                text1 = Regex.Replace(text1, reg.from + "\n?", reg.to,
+                text1 = Regex.Replace(text1, from + "\n?", to,
                     RegexOptions.IgnoreCase | RegexOptions.Singleline | RegexOptions.Multiline);
             }
 
