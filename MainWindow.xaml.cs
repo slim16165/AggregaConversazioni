@@ -1,23 +1,35 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Windows;
+using Telerik.Windows.Controls;
 
 namespace AggregaConversazioni
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow : Window, INotifyPropertyChanged
     {
+        public event PropertyChangedEventHandler PropertyChanged;
+
         public MainWindow()
         {
             InitializeComponent();
             DataContext = this;
+            MainWindow.debugGrid2 = this.debugGrid;
         }
 
         public ObservableCollection<RigaDivisaPerPersone> Righe { get; set; } =
             new ObservableCollection<RigaDivisaPerPersone>();
+        
+        public static ObservableCollection<RegexDebugData> RegexDebug { get; set; } =
+            new ObservableCollection<RegexDebugData>();
+
+        public static RadGridView debugGrid2;
+
+        
 
         private void MessengerButton_Click(object sender, RoutedEventArgs e)
         {

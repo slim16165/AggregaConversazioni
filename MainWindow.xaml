@@ -8,17 +8,25 @@
         Title="MainWindow" Height="1450" Width="1600">
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition />
-            <RowDefinition />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
         </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
 
-        <Canvas Grid.Row="0">
-            <StackPanel Canvas.Left="0" Orientation="Horizontal" Canvas.Top="40">
-                <TextBox x:Name="Input" TextWrapping="Wrap" AcceptsReturn="True" Width="700" Height="500" />
-                <TextBox x:Name="Output" TextWrapping="Wrap" AcceptsReturn="True" Width="700" Height="500" FontFamily="Courier New" />
-            </StackPanel>
+        <Grid Grid.Column="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <TextBox x:Name="Input" Grid.Row="0" TextWrapping="Wrap" AcceptsReturn="True" />
 
-            <StackPanel Canvas.Left="710" Canvas.Top="4" Orientation="Horizontal">
+            <TextBox x:Name="Output" Grid.Row="1" TextWrapping="Wrap" AcceptsReturn="True" FontFamily="Courier New" />
+        </Grid>
+        <StackPanel Grid.Column="1" Orientation="Vertical">
+            <StackPanel Orientation="Horizontal">
                 <Button Content="Facebook" Width="75" Margin="5" Click="FacebookButton_Click" />
                 <Button Content="Messenger" Width="75" Margin="5" Click="MessengerButton_Click" />
                 <Button Content="Instagram" Width="75" Margin="5" Click="InstagramButton_Click" />
@@ -26,10 +34,12 @@
                 <Button Content="Evernote" Width="75" Margin="5" Click="EvernoteButton_Click" />
                 <Button Content="Io/Lei ciclico" Width="75" Margin="5" Click="IoLeiCiclico_Click" />
             </StackPanel>
+            <controls:RadGridView Name="debugGrid" AutoGenerateColumns="True" SelectionUnit="Mixed" SelectionMode="Extended" />
+        </StackPanel>
 
-            <ListBox x:Name="Speakers" Width="300" Height="200" Canvas.Left="710" Canvas.Top="507" HorizontalAlignment="Center" VerticalAlignment="Top" />
-        </Canvas>
+        <ListBox Grid.Column="1" Grid.Row="1" x:Name="Speakers"  HorizontalAlignment="Center" VerticalAlignment="Top" />
 
-        <controls:RadGridView Grid.Row="1" ItemsSource="{Binding Righe}" AutoGenerateColumns="True" SelectionUnit="Mixed" SelectionMode="Extended" />
+
+        <controls:RadGridView Grid.Row="1" Grid.Column="0" ItemsSource="{Binding Righe}" AutoGenerateColumns="True" SelectionUnit="Mixed" SelectionMode="Extended" />
     </Grid>
 </Window>

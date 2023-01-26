@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using static Pihrtsoft.Text.RegularExpressions.Linq.Patterns;
+
 
 namespace AggregaConversazioni
 {
@@ -24,24 +26,24 @@ namespace AggregaConversazioni
 
         public IEnumerable<string> ApplyRegex(ref string text, IEnumerable<string> lines)
         {
-            string longSpeakerName = "Petra Giuliani";
+            string longSpeakerName = "Laura Eileen Gallo";
             //shortSpeakerName = "Julia";
             var shortSpeakerName = longSpeakerName.Split(' ').First();
 
 
             List<(string from, string to)> regexes = new List<(string @from, string to)>
             {
-                ($"You unsent a message[\n\r]+", ""),
-                ($"{shortSpeakerName}[\n\r]+{longSpeakerName}[\n\r]+", "Lei: "),
-                (@"You sent[\n\r]+", "Io: "),
-                ($"{shortSpeakerName} replied to you[\n\r]+", "Io: "),
-                ($"You replied to {shortSpeakerName}[\n\r]+", "Io: "),
-                ($"{shortSpeakerName} replied to themself[\n\r]+", "Lei: "),
-                ($"{shortSpeakerName}[\n\r]+", "Lei: "),
-                ($"{longSpeakerName}[\n\r]+", "Lei: "),
+                ($"You unsent a message", ""),
+                ($"{shortSpeakerName}{longSpeakerName}", "Lei: "),
+                (@"You sent", "Io: "),
+                ($"{shortSpeakerName} replied to you", "Io: "),
+                ($"You replied to {shortSpeakerName}", "Io: "),
+                ($"{shortSpeakerName} replied to themself", "Lei: "),
+                ($"{shortSpeakerName}", "Lei: "),
+                ($"{longSpeakerName}", "Lei: "),
 
                 //elimino da Noted
-                ($"^Enter[\n\r]+", ""),
+                ($"^Enter", ""),
 
                 //elimino le ore 
                 (@"^\d{1,2}:\d{2} [ap]m[\n\r]", ""),
@@ -53,7 +55,9 @@ namespace AggregaConversazioni
             //### Petra replied to you
             //### Petra replied to themself
             //### Petra
-            regexes = regexes.Select(r => ("^### " + r.from, r.to)).Union(regexes).ToList();
+            var regexesWithAnyLine = regexes.Select(r => (r.from + NewLine().ToString(), r.to));
+
+            regexes = regexesWithAnyLine.Union(regexes).ToList();
 
             DebugOutputTable = DebugHelper.Annotate(text, regexes);
 

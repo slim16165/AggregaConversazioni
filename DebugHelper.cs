@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using ConsoleTableExt;
 
@@ -25,6 +28,24 @@ namespace AggregaConversazioni
                     sost.countDist,
                     //sost.sost
                 }).ToList();
+
+            var tableData2 = (
+                from reg in regexes
+                let sost = CalculateReplacement(text1, reg)
+                select new RegexDebugData
+                {
+                    From = Escape(reg.@from),
+                    To = Escape(reg.to),
+                    Count = sost.count,
+                    CountDist = sost.countDist,
+                }).ToList();
+
+            MainWindow.RegexDebug = new ObservableCollection<RegexDebugData>(tableData2);
+
+            //MainWindow.debugGrid2.DataContext = new ObservableCollection<RegexDebugData>(tableData2); 
+            MainWindow.debugGrid2.ItemsSource = new ObservableCollection<RegexDebugData>(tableData2); 
+
+
 
 
             var tableRender =
@@ -68,9 +89,18 @@ namespace AggregaConversazioni
 
         private static string Escape(string source)
         {
-            source = source.Replace("\n", "");
-            source = source.Replace("\r", "");
-            return source.Substring(0, Math.Min(source.Length, 30));
+            //source = source.Replace("\n", "");
+            //source = source.Replace("\r", "");
+            return source; //.Substring(0, Math.Min(source.Length, 30));
         }
     }
+
+    public class RegexDebugData
+    {
+        public string From { get; set; }
+        public string To { get; set; }
+        public int Count { get; set; }
+        public int CountDist { get; set; }
+    }
+
 }
