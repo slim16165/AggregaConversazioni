@@ -3,3 +3,5 @@ obj
 packages
 .vs
 /AggregaConversazioni.csproj.user
+/.idea/.idea.AggregaConversazioni/.idea/
+*.user

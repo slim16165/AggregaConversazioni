@@ -60,9 +60,9 @@ namespace AggregaConversazioni
             return tableRender.ToString();
         }
 
-        private static (string sost, int count, int countDist) CalculateReplacement(string text1, (string from, string to) reg)
+        private static (string sost, int count, int countDist) CalculateReplacement(string text, (string from, string to) reg)
         {
-            var matches = Regex.Matches(text1, reg.from,
+            var matches = Regex.Matches(text, reg.from,
                 RegexOptions.IgnoreCase | RegexOptions.Singleline | RegexOptions.Multiline);
 
             var sostituzioniEffettuate = (from Match match in matches
@@ -92,6 +92,15 @@ namespace AggregaConversazioni
             //source = source.Replace("\n", "");
             //source = source.Replace("\r", "");
             return source; //.Substring(0, Math.Min(source.Length, 30));
+        }
+
+        public static string Annotate(string text, List<RegexDescription> regexes)
+        {
+            foreach (var regexDescription in regexes)
+            {
+                text = regexDescription.Regex.Replace(text, regexDescription.To);
+            }
+            return text;
         }
     }
 
