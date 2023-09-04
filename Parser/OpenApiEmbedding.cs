@@ -15,7 +15,7 @@ internal class OpenApiEmbedding
 {
     public static void Prova()
     {
-        OpenAIAPI api = new OpenAIAPI("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"); // shorthand
+        OpenAIAPI api = new OpenAIAPI(""); // shorthand
             
         //Task<EmbeddingResult> CreateEmbeddingAsync(EmbeddingRequest request);
 
