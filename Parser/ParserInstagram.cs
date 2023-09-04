@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using AggregaConversazioni.Parser;
 
 namespace AggregaConversazioni;
 
@@ -44,13 +45,23 @@ class ParserInstagram : Parser.ParserBase
 
         //Cerco quelli con Immagine del profilo di 
         string search = "^Immagine del profilo di (.+?)$";
-        var speakers = IdentifySpeakersBySearchString(enumerable, search);
+        var speakers = SpeakerIdentification.IdentifySpeakersBySearchString(enumerable, search);
         var speaker = speakers.Single();
 
         var lines2 = ApplyRegex(ref text, speaker);
 
-        var k = IdentifySpeaker2(enumerable);
+        var k = SpeakerIdentification.IdentifySpeaker2(enumerable);
 
         return (text, k, speakers);
+    }
+
+    public override ParserBase IdentifySpeakers()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public override ParserBase InitializeRegexPatterns(string fullSpeakerName, string shortSpeakerName = null)
+    {
+        throw new System.NotImplementedException();
     }
 }

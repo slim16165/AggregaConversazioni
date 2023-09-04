@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using AggregaConversazioni.Parser;
 
 namespace AggregaConversazioni;
 
@@ -127,6 +128,16 @@ class ParserEvernote : Parser.ParserBase
     }
 
     public override (string parsedText, IEnumerable<RigaDivisaPerPersone> righeDivisePerPersone, List<string> identifiedSpeakers) Parse(string text)
+    {
+        throw new NotImplementedException();
+    }
+
+    public override ParserBase IdentifySpeakers()
+    {
+        throw new NotImplementedException();
+    }
+
+    public override ParserBase InitializeRegexPatterns(string fullSpeakerName, string shortSpeakerName = null)
     {
         throw new NotImplementedException();
     }

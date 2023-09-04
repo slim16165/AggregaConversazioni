@@ -67,7 +67,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         var (outputText, rigaDivisaPerPersone, speakers) = selectedParser.Parse(text);
         DisplaySpeakers(speakers);
         Input.Text = outputText;
-        Output.Text = selectedParser.DebugOutputTable;
+        //Output.Text = selectedParser.DebugOutputTable;
     }
 
     private void DisplaySpeakers(List<string> speakers)

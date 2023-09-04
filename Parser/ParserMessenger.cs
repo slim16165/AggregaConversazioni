@@ -1,90 +1,107 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 using AggregaConversazioni.Parser;
-using static System.Environment;
 
 namespace AggregaConversazioni;
+
+public class ParserContext
+{
+    public string OriginalText { get; set; }
+    public IEnumerable<string> TextLines { get; set; }
+    public List<string> IdentifiedSpeakers { get; set; }
+    public List<RegexGroup> RegexGroups { get; set; } = new List<RegexGroup>();
+    public string DebugOutputTable { get; set; }
+}
 
 internal class ParserMessenger : ParserBase
 {
     public override (string parsedText, IEnumerable<RigaDivisaPerPersone> righeDivisePerPersone, List<string> identifiedSpeakers) Parse(string originalText)
     {
-        // Split the original text into individual lines and trim any leading or trailing whitespace from each line
-        var textLines = Regex.Split(originalText, @"(\n|\r)+").Select(o => o.Trim()).ToList();
+        var result = new ParserMessenger()
+            .WithText(originalText)
+            .SplitTextIntoLines()
+            .IdentifySpeakers()
+            .InitializeRegexPatterns("Laura Eileen Gallo")
+            .ApplyRegexAndClean()
+            .GetResult();
 
+        //// Process the original text based on certain regex patterns
+        //var processedLines = ApplyRegexAndClean(ref originalText, textLines, regexGroups);
+
+        return result; //(originalText, speakersFromMethod2, speakersFromPattern);
+    }
+
+    protected override void ApplyPostProcessingPatterns()
+    {
+        Context.OriginalText = ParserStatic.ParseIo_LeiCiclico(Context.OriginalText);
+    }
+
+    public override ParserBase IdentifySpeakers()
+    {
         // Search for lines containing "Immagine del profilo di" to identify potential speakers
         string profileImagePattern = "^(.+?) Immagine del profilo di";
-        var speakersFromPattern = IdentifySpeakersBySearchString(textLines, profileImagePattern);
+        var speakersFromPattern = SpeakerIdentification.IdentifySpeakersBySearchString(Context.TextLines, profileImagePattern);
 
-        // Use a secondary method to identify speakers
-        var speakersFromMethod2 = IdentifySpeaker2(textLines);
+        // Add the identified speakers to the Context or use them however you need
+        Context.IdentifiedSpeakers = speakersFromPattern;
 
-        // Process the original text based on certain regex patterns
-        var processedLines = ApplyRegexAndClean(ref originalText, textLines);
-
-        return (originalText, speakersFromMethod2, speakersFromPattern);
+        return this;
     }
 
-
-
-    public IEnumerable<string> ApplyRegexAndClean(ref string originalText, IEnumerable<string> lines)
+    public override ParserBase InitializeRegexPatterns(string fullSpeakerName, string shortSpeakerName = null)
     {
-        // Defining speaker names for better recognition
-        const string FullSpeakerName = "Laura Eileen Gallo";
-        var ShortSpeakerName = FullSpeakerName.Split(' ').First();
+        if (shortSpeakerName == null)
+            shortSpeakerName = fullSpeakerName.Split(' ').First();
 
         // Set of regex patterns and their replacements with corresponding description
-        List<RegexDescription> regexReplacements = new List<RegexDescription>
-    {
-        /*FROM - TO - Description*/
-        new(($"You unsent a message", ""),                        "Eliminate the literal message: 'You unsent a message'"),
-        new(($"{ShortSpeakerName}{FullSpeakerName}", "Lei: "),    "Replace short and full speaker names with 'Lei: '"),
-        new(($"You sent", "Io: "),                                "Replace 'You sent' with 'Io: '"),
-        new(($"{ShortSpeakerName} replied to you", "Io: "),       $"Replace '{ShortSpeakerName} replied to you' with 'Io: '"),
-        new(($"You replied to {ShortSpeakerName}", "Io: "),       $"Replace 'You replied to {ShortSpeakerName}' with 'Io: '"),
-        new(($"{ShortSpeakerName} replied to themself", "Lei: "), $"Replace '{ShortSpeakerName} replied to themself' with 'Lei: '"),
-        new(($"{ShortSpeakerName}", "Lei: "),                     $"Replace '{ShortSpeakerName}' with 'Lei: '"),
-        new(($"{FullSpeakerName}", "Lei: "),                      $"Replace '{FullSpeakerName}' with 'Lei: '"),
-
-        // Specific rules for the application "Noted"
-        new(($"^Enter", ""),                                      "Eliminate 'Enter' from the start of lines"),
-        new((@"^\d{1,2}:\d{2} [ap]m[\n\r]", ""),                  "Eliminate time-stamp hours from the start of lines"),
-    };
-
-        // Apply all the regex replacements on the original text
-        string cleanedText = originalText;
-        foreach (var regexPattern in regexReplacements)
+        var messageOperations = new RegexGroup("Message Operations")
         {
-            cleanedText = regexPattern.Regex.Replace(cleanedText, regexPattern.To);
-        }
+            RegexRules = new List<RegexDescription>
+            {
+                new(($"You unsent a message", ""), "Eliminate the literal message: 'You unsent a message'")
+            }
+        };
 
-        // Apply regex patterns that could be followed by any new line
-        //Sempre per Noted, elimino stringhe tipo queste:
-        //### You replied to Petra
-        //### You sent
-        //### Petra replied to you
-        //### Petra replied to themself
-        //### Petra
-        var regexWithPotentialNewLine = regexReplacements.Select(pattern =>
-            new RegexDescription((pattern.From + NewLine, pattern.To), pattern.Description));
-
-        regexReplacements = regexWithPotentialNewLine.Union(regexReplacements).ToList();
-
-        // Annotate the text for debugging purposes
-        DebugOutputTable = DebugHelper.Annotate(originalText, regexReplacements);
-
-        // Apply all regex replacements including those with potential new lines
-        foreach (var pattern in regexReplacements)
+        var speakerNameReplacements = new RegexGroup("Speaker Name Replacements", true) // True indica che l'ordine è importante
         {
-            originalText = Regex.Replace(originalText, pattern.From + "\n?", pattern.To,
-                RegexOptions.IgnoreCase | RegexOptions.Singleline | RegexOptions.Multiline);
-        }
+            RegexRules = new List<RegexDescription>
+            {
+                new(($"{shortSpeakerName}{fullSpeakerName}", "Lei: "), "Replace short and full speaker names with 'Lei: '"),
+                new(($"You sent", "Io: "), "Replace 'You sent' with 'Io: '"),
+                new(($"{shortSpeakerName}", "Lei: "), $"Replace '{shortSpeakerName}' with 'Lei: '"),
+                new(($"{fullSpeakerName}", "Lei: "), $"Replace '{fullSpeakerName}' with 'Lei: '"),
+            }
+        };
 
-        // Additional parsing logic for cyclic Io/Lei patterns
-        originalText = ParserStatic.ParseIo_LeiCiclico(originalText);
+        var replyOperations = new RegexGroup("Reply Operations")
+        {
+            RegexRules = new List<RegexDescription>
+            {
+                new(($"{shortSpeakerName} replied to you", "Io: "), $"Replace '{shortSpeakerName} replied to you' with 'Io: '"),
+                new(($"You replied to {shortSpeakerName}", "Io: "), $"Replace 'You replied to {shortSpeakerName}' with 'Io: '"),
+                new(($"{shortSpeakerName} replied to themself", "Lei: "), $"Replace '{shortSpeakerName} replied to themself' with 'Lei: '")
+            }
+        };
 
-        return lines;
+        var appSpecificOperations = new RegexGroup("App Specific Operations - Noted")
+        {
+            RegexRules = new List<RegexDescription>
+            {
+                new(($"^Enter", ""), "Eliminate 'Enter' from the start of lines"),
+                new((@"^\d{1,2}:\d{2} [ap]m[\n\r]", ""), "Eliminate time-stamp hours from the start of lines")
+            }
+        };
+
+        List<RegexGroup> regexGroups = new List<RegexGroup>
+        {
+            messageOperations,
+            speakerNameReplacements,
+            replyOperations,
+            appSpecificOperations
+        };
+
+        Context.RegexGroups = regexGroups;
+
+        return this;
     }
-
 }

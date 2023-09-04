@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using AggregaConversazioni.Parser;
 
 namespace AggregaConversazioni;
 
@@ -37,12 +38,22 @@ class ParserTelegram : Parser.ParserBase
 
         //Cerco quelli con Immagine del profilo di 
         string searchWithCapturingGroup = @"^(.+?), \[\d{2}/\d{2}/\d{4} \d{2}:\d{2}\]$\n";
-        var speakers = IdentifySpeakersBySearchString(enumerable, searchWithCapturingGroup);
+        var speakers = SpeakerIdentification.IdentifySpeakersBySearchString(enumerable, searchWithCapturingGroup);
 
         var lines2 = ApplyRegex(ref text, enumerable);
 
-        var k = IdentifySpeaker2(enumerable);
+        var k = SpeakerIdentification.IdentifySpeaker2(enumerable);
 
         return (text, k, speakers);
+    }
+
+    public override ParserBase IdentifySpeakers()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public override ParserBase InitializeRegexPatterns(string fullSpeakerName, string shortSpeakerName = null)
+    {
+        throw new System.NotImplementedException();
     }
 }

@@ -7,76 +7,83 @@ namespace AggregaConversazioni.Parser;
 
 public abstract class ParserBase
 {
+    protected ParserContext Context { get; } = new ParserContext();
+
     // Table for debugging purposes
-    public string DebugOutputTable = "";
-    public List<string> Speakers { get; set; }
+    public static List<string> Speakers { get; set; }
+
 
     // Abstract method to parse the text and return text, a set of lines, and identified speakers
     public abstract (string parsedText, IEnumerable<RigaDivisaPerPersone> righeDivisePerPersone, List<string> identifiedSpeakers) Parse(string text);
-
-    // Identify speakers based on a given regex pattern
-    [Obsolete("Preferisco un sistema automatico")]
-    public static List<string> IdentifySpeakersBySearchString(IEnumerable<string> lines, string search)
+    
+    public ParserBase WithText(string originalText)
     {
-        //search = "^(.+?) Immagine del profilo di";
-        var reg = ParserStatic.ExecuteRegex(search);
-        var k = lines.GetCapturingGroup(reg).DistinctNotEmpty();
-
-        var mostFreqLines = ParserStatic.GetMostFreqLines(lines);
-        k.AddRange(mostFreqLines);
-        return k.Distinct().ToList();
+        Context.OriginalText = originalText;
+        return this;
     }
 
-
-    // Identify and associate lines with respective speakers
-    public IEnumerable<RigaDivisaPerPersone> IdentifySpeaker2(IEnumerable<string> lines)
+    public ParserBase SplitTextIntoLines()
     {
-        if (Speakers == null)
-            ExtractSpeakers(string.Join("\n", lines));
+        Context.TextLines = Regex.Split(Context.OriginalText, @"(\n|\r)+").Select(o => o.Trim()).ToList();
+        return this;
+    }
 
-        lines = lines.Where(o => !string.IsNullOrWhiteSpace(o));
-        Dictionary<string, List<string>> speakersDict = new Dictionary<string, List<string>>();
-        string currentSpeaker = null;
+    public (string, IEnumerable<RigaDivisaPerPersone>, List<string>) GetResult()
+    {
+        // TODO: Return appropriate values based on the Context
+        return (Context.OriginalText, null, null); // Temporary return value, adjust as necessary
+    }
 
-        foreach (string curLine in lines)
+    public abstract ParserBase IdentifySpeakers();
+    public abstract ParserBase InitializeRegexPatterns(string fullSpeakerName, string shortSpeakerName = null);
+
+    public ParserBase ApplyRegexAndClean()
+    {
+        ApplyAllPatterns();
+        ApplyPatternsWithNewLines();
+        AnnotateDebugOutput();
+        ApplyPostProcessingPatterns();
+
+        return this;
+    }
+
+    protected virtual void ApplyAllPatterns()
+    {
+        foreach (var regexPattern in Context.RegexGroups)
         {
-            if (IsSpeaker(curLine))
-            {
-                currentSpeaker = curLine;
-                if (!speakersDict.ContainsKey(currentSpeaker))
-                {
-                    speakersDict[currentSpeaker] = new List<string>();
-                }
-            }
-            else if (currentSpeaker != null)
-            {
-                speakersDict[currentSpeaker].Add(curLine);
-            }
-        }
-
-        foreach (var pair in speakersDict)
-        {
-            yield return new RigaDivisaPerPersone { Speaker = pair.Key, Messages = pair.Value };
+            Context.OriginalText = regexPattern.ApplyAll(Context.OriginalText);
         }
     }
 
-
-    // Determine if a given line is a speaker's name
-    public virtual bool IsSpeaker(string line)
+    protected virtual void ApplyPatternsWithNewLines()
     {
-        return Speakers.Any(s => s.StartsWith(line));
+        var regexReplacements = Context.RegexGroups.SelectMany(group => group.RegexRules).ToList();
+        regexReplacements = RegexReplacementsWithNewLine(regexReplacements);
+
+        foreach (var pattern in regexReplacements)
+        {
+            Context.OriginalText = Regex.Replace(Context.OriginalText, pattern.From + "\n?", pattern.To,
+                RegexOptions.IgnoreCase | RegexOptions.Singleline | RegexOptions.Multiline);
+        }
     }
 
-
-    // Extract a list of speakers from the given text
-    public virtual void ExtractSpeakers(string text)
+    public List<RegexDescription> RegexReplacementsWithNewLine(List<RegexDescription> regexReplacements)
     {
-        // Regex pattern to identify names or names with surnames
-        Regex regex = new Regex(@"^(\w+)( \w+)?$", RegexOptions.Multiline);
+        var regexWithPotentialNewLine = regexReplacements.Select(pattern =>
+            new RegexDescription((pattern.From + Environment.NewLine, pattern.To), pattern.Description));
 
-        var matches = regex.Matches(text);
+        regexReplacements = regexWithPotentialNewLine.Union(regexReplacements).ToList();
+        return regexReplacements;
+    }
 
-        // Extract matched speakers and return as a list
-        Speakers = matches.Cast<Match>().Select(m => m.Value).Distinct().ToList();
+    protected virtual void AnnotateDebugOutput()
+    {
+        var regexReplacements = Context.RegexGroups.SelectMany(group => group.RegexRules).ToList();
+        Context.DebugOutputTable = DebugHelper.Annotate(Context.OriginalText, regexReplacements);
+    }
+
+    protected virtual void ApplyPostProcessingPatterns()
+    {
+        //...
     }
 }

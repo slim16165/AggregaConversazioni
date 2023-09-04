@@ -10,4 +10,14 @@ public class ParserIoLeiCiclico : ParserBase
         text = ParserStatic.ParseIo_LeiCiclico(text);
         return (text, null, null);
     }
+
+    public override ParserBase IdentifySpeakers()
+    {
+        return this;
+    }
+
+    public override ParserBase InitializeRegexPatterns(string fullSpeakerName, string shortSpeakerName = null)
+    {
+        return this;
+    }
 }
