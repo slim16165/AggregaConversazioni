@@ -4,7 +4,6 @@ using System.Text.RegularExpressions;
 using AggregaConversazioni.Parser;
 using static System.Environment;
 
-
 namespace AggregaConversazioni;
 
 internal class ParserMessenger : ParserBase

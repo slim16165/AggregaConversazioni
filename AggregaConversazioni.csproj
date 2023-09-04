@@ -170,6 +170,7 @@
     <Compile Include="Parser\ParserTelegram.cs" />
     <Compile Include="Parser\ParserMessenger.cs" />
     <Compile Include="Parser\ParserInstagram.cs" />
+    <Compile Include="RegexDebugData.cs" />
     <Compile Include="Regex\RegexDescription.cs" />
     <Compile Include="RigaDivisaPerPersone.cs" />
     <Page Include="MainWindow.xaml">
