@@ -31,13 +31,13 @@ class ParserTelegram : Parser.ParserBase
 
     }
 
-    public override (string text, IEnumerable<RigaDivisaPerPersone> righeDivisePerPersone, List<string> speakers) Parse(string text)
+    public override (string parsedText, IEnumerable<RigaDivisaPerPersone> righeDivisePerPersone, List<string> identifiedSpeakers) Parse(string text)
     {
         var enumerable = Regex.Split(text, @"(\n|\r)+").Select(o => o.Trim()).ToList();
 
         //Cerco quelli con Immagine del profilo di 
         string searchWithCapturingGroup = @"^(.+?), \[\d{2}/\d{2}/\d{4} \d{2}:\d{2}\]$\n";
-        var speakers = IdentifySpeakers(enumerable, searchWithCapturingGroup);
+        var speakers = IdentifySpeakersBySearchString(enumerable, searchWithCapturingGroup);
 
         var lines2 = ApplyRegex(ref text, enumerable);
 

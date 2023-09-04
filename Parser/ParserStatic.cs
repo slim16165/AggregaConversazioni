@@ -4,7 +4,7 @@ using System.Text.RegularExpressions;
 
 namespace AggregaConversazioni.Parser
 {
-    internal class ParserStatic
+    internal static class ParserStatic
     {
         public static List<string> GetMostFreqLines(IEnumerable<string> lines)
         {
@@ -38,13 +38,6 @@ namespace AggregaConversazioni.Parser
             } while (hasChanged);
 
             return dopo;
-        }
-
-        public static (string text, IEnumerable<RigaDivisaPerPersone> righeDivisePerPersone, List<string> speakers) ParseIo_LeiCiclico2(string text)
-        {
-            text = ParseIo_LeiCiclico(text);
-
-            return (text, null, null);
         }
 
         internal static Regex ExecuteRegex(string search)

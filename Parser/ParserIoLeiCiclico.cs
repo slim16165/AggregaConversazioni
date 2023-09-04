@@ -1,13 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using AggregaConversazioni.Parser;
 
 namespace AggregaConversazioni;
 
 public class ParserIoLeiCiclico : ParserBase
 {
-    public override (string text, IEnumerable<RigaDivisaPerPersone> righeDivisePerPersone, List<string> speakers) Parse(string text)
+    public override (string parsedText, IEnumerable<RigaDivisaPerPersone> righeDivisePerPersone, List<string> identifiedSpeakers) Parse(string text)
     {
-        return ParserStatic.ParseIo_LeiCiclico2(text);
+        text = ParserStatic.ParseIo_LeiCiclico(text);
+        return (text, null, null);
     }
 }

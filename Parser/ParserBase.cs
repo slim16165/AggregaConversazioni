@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 
@@ -11,11 +12,13 @@ public abstract class ParserBase
     public List<string> Speakers { get; set; }
 
     // Abstract method to parse the text and return text, a set of lines, and identified speakers
-    public abstract (string text, IEnumerable<RigaDivisaPerPersone> righeDivisePerPersone, List<string> speakers) Parse(string text);
+    public abstract (string parsedText, IEnumerable<RigaDivisaPerPersone> righeDivisePerPersone, List<string> identifiedSpeakers) Parse(string text);
 
     // Identify speakers based on a given regex pattern
-    public static List<string> IdentifySpeakers(IEnumerable<string> lines, string search)
+    [Obsolete("Preferisco un sistema automatico")]
+    public static List<string> IdentifySpeakersBySearchString(IEnumerable<string> lines, string search)
     {
+        //search = "^(.+?) Immagine del profilo di";
         var reg = ParserStatic.ExecuteRegex(search);
         var k = lines.GetCapturingGroup(reg).DistinctNotEmpty();
 
@@ -26,8 +29,11 @@ public abstract class ParserBase
 
 
     // Identify and associate lines with respective speakers
-    protected IEnumerable<RigaDivisaPerPersone> IdentifySpeaker2(IEnumerable<string> lines)
+    public IEnumerable<RigaDivisaPerPersone> IdentifySpeaker2(IEnumerable<string> lines)
     {
+        if (Speakers == null)
+            ExtractSpeakers(string.Join("\n", lines));
+
         lines = lines.Where(o => !string.IsNullOrWhiteSpace(o));
         Dictionary<string, List<string>> speakersDict = new Dictionary<string, List<string>>();
         string currentSpeaker = null;

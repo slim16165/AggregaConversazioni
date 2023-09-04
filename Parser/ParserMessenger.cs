@@ -7,22 +7,26 @@ using static System.Environment;
 
 namespace AggregaConversazioni;
 
-internal class ParserMessenger : Parser.ParserBase
+internal class ParserMessenger : ParserBase
 {
-    public override (string text, IEnumerable<RigaDivisaPerPersone> righeDivisePerPersone, List<string> speakers) Parse(string text)
+    public override (string parsedText, IEnumerable<RigaDivisaPerPersone> righeDivisePerPersone, List<string> identifiedSpeakers) Parse(string originalText)
     {
-        var enumerable = Regex.Split(text, @"(\n|\r)+").Select(o => o.Trim()).ToList();
+        // Split the original text into individual lines and trim any leading or trailing whitespace from each line
+        var textLines = Regex.Split(originalText, @"(\n|\r)+").Select(o => o.Trim()).ToList();
 
-        //Cerco quelli con Immagine del profilo di 
-        string search = "^(.+?) Immagine del profilo di";
-        var speakers = IdentifySpeakers(enumerable, search);
+        // Search for lines containing "Immagine del profilo di" to identify potential speakers
+        string profileImagePattern = "^(.+?) Immagine del profilo di";
+        var speakersFromPattern = IdentifySpeakersBySearchString(textLines, profileImagePattern);
 
-        var lines2 = ApplyRegex(ref text, enumerable);
+        // Use a secondary method to identify speakers
+        var speakersFromMethod2 = IdentifySpeaker2(textLines);
 
-        var k = IdentifySpeaker2(enumerable);
+        // Process the original text based on certain regex patterns
+        var processedLines = ApplyRegex(ref originalText, textLines);
 
-        return (text, k, speakers);
+        return (originalText, speakersFromMethod2, speakersFromPattern);
     }
+
 
 
     public IEnumerable<string> ApplyRegex(ref string originalText, IEnumerable<string> lines)
@@ -51,9 +55,7 @@ internal class ParserMessenger : Parser.ParserBase
         {
             cleanedText = regexDescription.Regex.Replace(cleanedText, regexDescription.To);
         }
-
-
-
+        
         //Sempre per Noted, elimino stringhe tipo queste:
         //### You replied to Petra
         //### You sent

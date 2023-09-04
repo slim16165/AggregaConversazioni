@@ -37,14 +37,14 @@ class ParserInstagram : Parser.ParserBase
     }
 
 
-    public override (string text, IEnumerable<RigaDivisaPerPersone> righeDivisePerPersone, List<string> speakers) Parse(string text)
+    public override (string parsedText, IEnumerable<RigaDivisaPerPersone> righeDivisePerPersone, List<string> identifiedSpeakers) Parse(string text)
     {
         var enumerable = Regex.Split(text, @"(\n|\r)+").Select(o => o.Trim()).ToList();
         //Le regex sono le seguenti: ^(You sent|Stephanie replied to you|Original message:|Stephanie Frogs|Stephanie|)
 
         //Cerco quelli con Immagine del profilo di 
         string search = "^Immagine del profilo di (.+?)$";
-        var speakers = IdentifySpeakers(enumerable, search);
+        var speakers = IdentifySpeakersBySearchString(enumerable, search);
         var speaker = speakers.Single();
 
         var lines2 = ApplyRegex(ref text, speaker);
