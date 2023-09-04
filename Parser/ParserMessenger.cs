@@ -9,7 +9,7 @@ namespace AggregaConversazioni;
 
 internal class ParserMessenger : Parser.ParserBase
 {
-    public override (string text, IEnumerable<RigaDivisaPerPersone> k, List<string> speakers) Parse(string text)
+    public override (string text, IEnumerable<RigaDivisaPerPersone> righeDivisePerPersone, List<string> speakers) Parse(string text)
     {
         var enumerable = Regex.Split(text, @"(\n|\r)+").Select(o => o.Trim()).ToList();
 
@@ -77,7 +77,7 @@ internal class ParserMessenger : Parser.ParserBase
         originalText = text1;
 
         //Parse Io/Lei ciclico
-        originalText = ParserStatic.ParseIo_LeiCiclico(base.Text);
+        originalText = ParserStatic.ParseIo_LeiCiclico(originalText);
 
         return lines;
     }

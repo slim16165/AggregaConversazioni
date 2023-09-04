@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace AggregaConversazioni.Parser
 {
@@ -43,7 +40,7 @@ namespace AggregaConversazioni.Parser
             return dopo;
         }
 
-        public static (string text, IEnumerable<RigaDivisaPerPersone> k, List<string> speakers) ParseIo_LeiCiclico2(string text)
+        public static (string text, IEnumerable<RigaDivisaPerPersone> righeDivisePerPersone, List<string> speakers) ParseIo_LeiCiclico2(string text)
         {
             text = ParseIo_LeiCiclico(text);
 

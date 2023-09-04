@@ -159,6 +159,9 @@
     </ApplicationDefinition>
     <Compile Include="DebugHelper.cs" />
     <Compile Include="Extension.cs" />
+    <Compile Include="ParserFactory.cs" />
+    <Compile Include="Parser\ParserIoLeiCiclico.cs" />
+    <Compile Include="ParserType.cs" />
     <Compile Include="Parser\MediaWiki2Neo4j.cs" />
     <Compile Include="Parser\OpenApiEmbedding.cs" />
     <Compile Include="Parser\ParserBase.cs" />

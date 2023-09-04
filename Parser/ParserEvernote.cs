@@ -126,7 +126,7 @@ class ParserEvernote : Parser.ParserBase
         return text;
     }
 
-    public override (string text, IEnumerable<RigaDivisaPerPersone> k, List<string> speakers) Parse(string text)
+    public override (string text, IEnumerable<RigaDivisaPerPersone> righeDivisePerPersone, List<string> speakers) Parse(string text)
     {
         throw new NotImplementedException();
     }

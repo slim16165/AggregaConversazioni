@@ -28,29 +28,25 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     public static RadGridView debugGrid2;
 
-        
 
     private void MessengerButton_Click(object sender, RoutedEventArgs e)
     {
-        ParserBase p = new ParserMessenger();
-        Parse(p);
+        ParseAndDisplay(ParserFactory.Create(ParserType.Messenger));
     }
 
     private void InstagramButton_Click(object sender, RoutedEventArgs e)
     {
-        ParserBase p = new ParserInstagram();
-        Parse(p);
+        ParseAndDisplay(ParserFactory.Create(ParserType.Instagram));
     }
 
     private void TelegramButton_Click(object sender, RoutedEventArgs e)
     {
-        ParserBase p = new ParserTelegram();
-        Parse(p);
+        ParseAndDisplay(ParserFactory.Create(ParserType.Telegram));
     }
 
     private void IoLeiCiclico_Click(object sender, RoutedEventArgs e)
     {
-        Parse(ParserStatic.ParseIo_LeiCiclico2);
+        ParseAndDisplay(ParserFactory.Create(ParserType.IoLeiCiclico));
     }
 
     private void EvernoteButton_Click(object sender, RoutedEventArgs e)
@@ -63,35 +59,23 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         throw new NotImplementedException();
     }
 
-    private void Parse(ParserBase p)
+    private void ParseAndDisplay(ParserBase selectedParser)
     {
         Righe.Clear();
         var text = Input.Text;
 
-        var (outputText, k, speakers) = p.Parse(text);
-            
-        foreach (string speaker in speakers ?? new List<string>())
-        {
-            Speakers.Items.Add(speaker);
-        }
-
+        var (outputText, rigaDivisaPerPersone, speakers) = selectedParser.Parse(text);
+        DisplaySpeakers(speakers);
         Input.Text = outputText;
-        Output.Text = p.DebugOutputTable;
+        Output.Text = selectedParser.DebugOutputTable;
     }
 
-    private void Parse(Func<string, (string text, IEnumerable<RigaDivisaPerPersone> k, List<string> speakers)> analizza)
+    private void DisplaySpeakers(List<string> speakers)
     {
-        Righe.Clear();
-        var text = Input.Text;
-
-        var (outputText, k, speakers) = analizza(text);
-
         foreach (string speaker in speakers ?? new List<string>())
         {
             Speakers.Items.Add(speaker);
         }
-
-        Input.Text = outputText;
     }
 
     private void AnalizzaEvernote()
@@ -103,6 +87,4 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
         Input.Text = outputText;
     }
-
-        
 }

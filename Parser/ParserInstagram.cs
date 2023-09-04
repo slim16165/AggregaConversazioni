@@ -37,7 +37,7 @@ class ParserInstagram : Parser.ParserBase
     }
 
 
-    public override (string text, IEnumerable<RigaDivisaPerPersone> k, List<string> speakers) Parse(string text)
+    public override (string text, IEnumerable<RigaDivisaPerPersone> righeDivisePerPersone, List<string> speakers) Parse(string text)
     {
         var enumerable = Regex.Split(text, @"(\n|\r)+").Select(o => o.Trim()).ToList();
         //Le regex sono le seguenti: ^(You sent|Stephanie replied to you|Original message:|Stephanie Frogs|Stephanie|)
