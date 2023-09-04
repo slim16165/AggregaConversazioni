@@ -13,32 +13,13 @@ internal abstract class ParserBase
 
     public static List<string> IdentifySpeakers(IEnumerable<string> lines, string search)
     {
-        var reg = ExecuteRegex(search);
+        var reg = ParserStatic.ExecuteRegex(search);
         var k = lines.GetCapturingGroup(reg).DistinctNotEmpty();
 
-        //Metodo alternativo, serco le righe ripetute più volte
-        var mostFreqLines = GetMostFreqLines(lines);
+        //Metodo alternativo, cerco le righe ripetute più volte
+        var mostFreqLines = ParserStatic.GetMostFreqLines(lines);
 
         return k;
-    }
-
-    private static List<string> GetMostFreqLines(IEnumerable<string> lines)
-    {
-        return lines.GroupBy(s => s)
-            .Select(group => new {
-                Text = @group.Key,
-                Count = @group.Count()
-            })
-            .Where(l => l.Count != 1
-                        && !string.IsNullOrWhiteSpace(l.Text)
-                        && l.Text.Length < 20)
-            .OrderByDescending(x => x.Count)
-            .Select(s => s.Text).ToList();
-    }
-
-    internal static Regex ExecuteRegex(string search)
-    {
-        return new Regex(search, RegexOptions.IgnoreCase | RegexOptions.Multiline);
     }
 
     protected static IEnumerable<RigaDivisaPerPersone> IdentifySpeaker2(IEnumerable<string> lines)
@@ -46,77 +27,51 @@ internal abstract class ParserBase
         //Elimino le righe vuote
         lines = lines.Where(o => !string.IsNullOrWhiteSpace(o));
 
-        var speakers2 = new[] { "Persona1", "Persona2", "Persona3" };
-        Dictionary<string, List<string>> dict = new Dictionary<string, List<string>>();
+        // Dictionary to hold the lines for each speaker
+        Dictionary<string, List<string>> speakersDict = new Dictionary<string, List<string>>();
 
-
-        var output = new Dictionary<string, Action<RigaDivisaPerPersone, string>>
-        {
-            { speakers2[0], (p, v) => p.Persona1 = v },
-            { speakers2[1], (p, v) => p.Persona2 = v },
-            { speakers2[2], (p, v) => p.Persona3 = v }
-        };
-
-        string currentBin = speakers2[0]; //Se non so chi sta parlando per primo scelgo a caso
+        string currentSpeaker = null;
 
         foreach (string curLine in lines)
         {
-            //la riga corrente è il nome di una persona che parla
-            if (speakers2.Contains(curLine))
+            // If current line is a speaker's name
+            if (IsSpeaker(curLine)) // You'll need to implement this function
             {
-                //if (output.ContainsKey(currentBin))
+                currentSpeaker = curLine;
+                if (!speakersDict.ContainsKey(currentSpeaker))
                 {
-                    //output[currentBin].AppendText("\n\n");
+                    speakersDict[currentSpeaker] = new List<string>();
                 }
-                currentBin = curLine;
             }
-            else
+            else if (currentSpeaker != null)
             {
-                if (!dict.ContainsKey(currentBin) || dict[currentBin] == null)
-                    dict[currentBin] = new List<string>();
-                else
-                    dict[currentBin].Add(curLine);
-
-                //output[currentBin].AppendText(curLine);
-
+                speakersDict[currentSpeaker].Add(curLine);
                 var row = new RigaDivisaPerPersone();
-                var function = output[currentBin];
-
-                function(row, curLine);
-
-                ////if(currentBin)
-                //var k2 = new Func<RigaDivisaPerPersone, string, object>((p, v) => p.Persona1 = v);
-                //var k3 = new Action<RigaDivisaPerPersone, string>((p, v) => p.Persona1 = v);
-
+                row.GetType().GetProperty(currentSpeaker).SetValue(row, curLine);
                 yield return row;
             }
         }
     }
 
-    protected internal static string ParseIo_LeiCiclico(string text)
+    // Simple function to determine if a line is a speaker
+    private static bool IsSpeaker(string line)
     {
-        //versione vecchia
-        //Regex regexObj2 = new Regex(@"^(Io|Lei): ([^:]+?)[\n\s\r]+\k<1>: ", RegexOptions.IgnoreCase | RegexOptions.Singleline | RegexOptions.Multiline);
-        Regex regexObj2 = new Regex(@"^(Io|Lei): ((?:(?!^(Io|Lei)).)+?)[\n\s\r]+\k<1>: ", RegexOptions.IgnoreCase | RegexOptions.Singleline | RegexOptions.Multiline);
-
-        string prima = text, dopo;
-
-
-        bool hasChanged;
-        do
-        {
-            dopo = regexObj2.Replace(prima, @"$1: $2 ");
-            hasChanged = prima != dopo;
-            prima = dopo;
-        } while (hasChanged);
-
-        return dopo;
+        // Here, add logic to determine if a line is a speaker.
+        // This could be a list of known speakers, or some other criteria.
+        return ...;
     }
 
-    public static (string text, IEnumerable<RigaDivisaPerPersone> k, List<string> speakers) ParseIo_LeiCiclico2(string text)
-    {
-        text = ParseIo_LeiCiclico(text);
 
-        return (text, null, null);
+    public virtual List<string> ExtractSpeakers(string text)
+    {
+        // Pattern to identify names or names with surnames followed by a newline.
+        Regex regex = new Regex(@"^(\w+)( \w+)?$", RegexOptions.Multiline);
+
+        var matches = regex.Matches(text);
+
+        // Extract the matched speakers and convert them to a list
+        List<string> speakers = matches.Cast<Match>().Select(m => m.Value).Distinct().ToList();
+
+        return speakers;
     }
 }

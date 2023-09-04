@@ -50,7 +50,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void IoLeiCiclico_Click(object sender, RoutedEventArgs e)
     {
-        Parse(ParserBase.ParseIo_LeiCiclico2);
+        Parse(ParserStatic.ParseIo_LeiCiclico2);
     }
 
     private void EvernoteButton_Click(object sender, RoutedEventArgs e)

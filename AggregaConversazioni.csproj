@@ -163,6 +163,7 @@
     <Compile Include="Parser\OpenApiEmbedding.cs" />
     <Compile Include="Parser\ParserBase.cs" />
     <Compile Include="Parser\ParserEvernote.cs" />
+    <Compile Include="Parser\ParserStatic.cs" />
     <Compile Include="Parser\ParserTelegram.cs" />
     <Compile Include="Parser\ParserMessenger.cs" />
     <Compile Include="Parser\ParserInstagram.cs" />

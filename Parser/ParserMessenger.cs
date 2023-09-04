@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using AggregaConversazioni.Parser;
 using static System.Environment;
 
 
@@ -76,7 +77,7 @@ internal class ParserMessenger : Parser.ParserBase
         originalText = text1;
 
         //Parse Io/Lei ciclico
-        originalText = ParseIo_LeiCiclico(originalText);
+        originalText = ParserStatic.ParseIo_LeiCiclico(base.Text);
 
         return lines;
     }
