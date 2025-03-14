@@ -6,7 +6,7 @@ namespace AggregaConversazioni.Transformers;
 
 public abstract class RegexBasedTransformer : ITextTransformer
 {
-    protected List<(string pattern, string replacement)> RegexReplacements { get; set; } = new List<(string, string)>();
+    protected List<(string pattern, string replacement)> RegexReplacements { get; set; } = new();
 
     public virtual string Transform(string input)
     {

@@ -1,15 +1,19 @@
 ﻿<Window x:Class="AggregaConversazioni.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:avalonEdit="http://icsharpcode.net/sharpdevelop/avalonedit"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:telerik="http://schemas.telerik.com/2008/xaml/presentation"
-        mc:Ignorable="d"
+        xmlns:helpers="clr-namespace:AggregaConversazioni.Helpers"
+        xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+        xmlns:global="clr-namespace:"
+        xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
+    mc:Ignorable="d"
         Title="Text Converter Pro" 
         Height="800" Width="1200"
         WindowStartupLocation="CenterScreen"
         MinHeight="600" MinWidth="800">
-
     <DockPanel LastChildFill="True">
         <!-- Toolbar fissa in alto -->
         <ToolBar DockPanel.Dock="Top" Padding="5" Background="#EEE">
@@ -25,28 +29,18 @@
                           Margin="5,0,0,0"/>
             </StackPanel>
             <Separator/>
-            <!-- Bottone Converti con icona FontAwesome -->
+            <!-- Bottone Converti con icona Metro.IconPacks -->
             <Button Command="{Binding ConvertCommand}" Width="100" ToolTip="Avvia la conversione">
                 <StackPanel Orientation="Horizontal">
-                    <TextBlock FontFamily="FontAwesome" 
-                               Text="&#xf1ec;" 
-                               FontSize="16" 
-                               VerticalAlignment="Center"/>
-                    <TextBlock Text="Converti" 
-                               Margin="5,0,0,0" 
-                               VerticalAlignment="Center"/>
+                    <iconPacks:PackIconMaterial Kind="Calculator" Width="16" Height="16" Foreground="Black"/>
+                    <TextBlock Text="Converti" Margin="5,0,0,0" VerticalAlignment="Center"/>
                 </StackPanel>
             </Button>
-            <!-- Bottone Carica Esempio con icona FontAwesome -->
+            <!-- Bottone Carica Esempio con icona Metro.IconPacks -->
             <Button Command="{Binding LoadSampleCommand}" Width="120" ToolTip="Carica un esempio" Margin="5,0,0,0">
                 <StackPanel Orientation="Horizontal">
-                    <TextBlock FontFamily="FontAwesome" 
-                               Text="&#xf040;" 
-                               FontSize="16" 
-                               VerticalAlignment="Center"/>
-                    <TextBlock Text="Carica Esempio" 
-                               Margin="5,0,0,0" 
-                               VerticalAlignment="Center"/>
+                    <iconPacks:PackIconMaterial Kind="FileUpload" Width="16" Height="16" Foreground="Black"/>
+                    <TextBlock Text="Carica Esempio" Margin="5,0,0,0" VerticalAlignment="Center"/>
                 </StackPanel>
             </Button>
             <!-- Toggle per il Debug Mode -->
@@ -68,48 +62,47 @@
             <TextBlock Text="caratteri convertiti"/>
         </StatusBar>
 
-        <!-- Layout principale: Grid con GridSplitter e pannello Debug racchiuso in un Expander -->
+        <!-- Layout principale: Grid a due colonne con GridSplitter -->
         <Grid>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="192*"/>
+                <ColumnDefinition Width="107*"/>
                 <ColumnDefinition Width="5"/>
-                <ColumnDefinition Width="3*"/>
+                <ColumnDefinition Width="299*"/>
             </Grid.ColumnDefinitions>
-
-            <!-- Area Input/Output in TabControl (prima colonna) -->
-            <TabControl Grid.Column="0">
-                <TabItem Header="Input">
-                    <TextBox x:Name="InputTextBox"
-                             AcceptsReturn="True"
-                             TextWrapping="Wrap"
-                             FontFamily="Consolas"
-                             Padding="5"
-                             VerticalScrollBarVisibility="Auto"
-                             Text="{Binding InputText, UpdateSourceTrigger=PropertyChanged}"/>
-                </TabItem>
-                <TabItem Header="Output">
-                    <TextBox x:Name="OutputTextBox"
-                             IsReadOnly="True"
-                             TextWrapping="Wrap"
-                             FontFamily="Consolas"
-                             Padding="5"
-                             VerticalScrollBarVisibility="Auto"
-                             Text="{Binding OutputText}"/>
-                </TabItem>
-            </TabControl>
-
-            <!-- GridSplitter per ridimensionare le due aree -->
-            <GridSplitter Grid.Column="1"
+            <!-- Editor di Input -->
+            <avalonEdit:TextEditor x:Name="InputTextEditor"
+                                   Grid.Column="0"
+                                   ShowLineNumbers="True"
+                                   FontFamily="Consolas"
+                                   Padding="5"
+                                   VerticalScrollBarVisibility="Auto" Grid.ColumnSpan="3" Margin="0,0,4,0">
+                <b:Interaction.Behaviors>
+                    <global:TextEditorBehavior BoundText="{Binding InputText, Mode=TwoWay}"/>
+                </b:Interaction.Behaviors>
+            </avalonEdit:TextEditor>
+            <!-- GridSplitter per ridimensionamento -->
+            <GridSplitter Grid.Column="2"
                           HorizontalAlignment="Stretch"
-                          VerticalAlignment="Stretch"
                           Width="5"
                           Background="Gray"
                           ShowsPreview="True"
                           Cursor="SizeWE"/>
-
+            <!-- Editor di Output -->
+            <avalonEdit:TextEditor x:Name="OutputTextEditor"
+                                   Grid.Column="2"
+                                   IsReadOnly="True"
+                                   ShowLineNumbers="True"
+                                   FontFamily="Consolas"
+                                   Padding="5"
+                                   VerticalScrollBarVisibility="Auto" Grid.ColumnSpan="2" Margin="4,0,0,0">
+                <b:Interaction.Behaviors>
+                    <global:TextEditorBehavior BoundText="{Binding OutputText, Mode=TwoWay}"/>
+                </b:Interaction.Behaviors>
+            </avalonEdit:TextEditor>
             <!-- Pannello Debug in un Expander (terza colonna) -->
             <Expander Grid.Column="2" Header="Debug" IsExpanded="True"
-                      Visibility="{Binding ShowDebug, Converter={StaticResource BoolToVisibilityConverter}}">
+                      Visibility="{Binding ShowDebug, Converter={StaticResource BoolToVisibilityConverter}}" Grid.ColumnSpan="2" Margin="4,0,0,0">
                 <DockPanel>
                     <TabControl DockPanel.Dock="Top">
                         <TabItem Header="Regole Applicate">

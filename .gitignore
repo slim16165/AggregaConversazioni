@@ -7,3 +7,4 @@ packages
 *.user
 /.vs/AggregaConversazioni/v17/.suo
 /.vs/AggregaConversazioni/v17/.suo
+/CombinedFile.cs

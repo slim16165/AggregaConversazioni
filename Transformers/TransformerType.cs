@@ -1,13 +1,13 @@
-﻿namespace AggregaConversazioni.Transformers
+﻿namespace AggregaConversazioni.Transformers;
+
+public enum TransformerType
 {
-    public enum TransformerType
-    {
-        Messenger,
-        Instagram,
-        Telegram,
-        IoLeiCiclico,
-        Evernote,
-        Facebook,
-        MarkdownToWiki // <-- Aggiunto
-    }
+    Messenger,
+    Instagram,
+    Telegram,
+    IoLeiCiclico,
+    Evernote,
+    Facebook,
+    MarkdownToWiki ,
+    MarkdownToWikiPandoc
 }

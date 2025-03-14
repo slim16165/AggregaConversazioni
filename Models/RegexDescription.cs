@@ -37,7 +37,7 @@ public class RegexDescription
 
 public class RegexGroup
 {
-    public List<RegexDescription> RegexRules { get; set; } = new List<RegexDescription>();
+    public List<RegexDescription> RegexRules { get; set; } = new();
     public bool IsOrderImportant { get; set; } // Indica se l'ordine delle regex nel gruppo è importante
     public string GroupName { get; set; } // Una descrizione o un nome per il gruppo, opzionale
 

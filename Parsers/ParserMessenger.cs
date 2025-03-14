@@ -10,7 +10,7 @@ public class ParserContext
     public string OriginalText { get; set; }
     public IEnumerable<string> TextLines { get; set; }
     public List<string> IdentifiedSpeakers { get; set; }
-    public List<RegexGroup> RegexGroups { get; set; } = new List<RegexGroup>();
+    public List<RegexGroup> RegexGroups { get; set; } = new();
     public string DebugOutputTable { get; set; }
 }
 

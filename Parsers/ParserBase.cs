@@ -9,7 +9,7 @@ namespace AggregaConversazioni.Parsers;
 
 public abstract class ParserBase : ITextTransformer
 {
-    protected ParserContext Context { get; } = new ParserContext();
+    protected ParserContext Context { get; } = new();
 
     // Table for debugging purposes
     public static List<string> Speakers { get; set; }
