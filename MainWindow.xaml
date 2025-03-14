@@ -3,43 +3,142 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:controls="clr-namespace:Telerik.Windows.Controls;assembly=Telerik.Windows.Controls.GridView"
+        xmlns:telerik="http://schemas.telerik.com/2008/xaml/presentation"
         mc:Ignorable="d"
-        Title="MainWindow" Height="1450" Width="1600">
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*" />
-            <RowDefinition Height="*" />
-        </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="*" />
-        </Grid.ColumnDefinitions>
+        Title="Text Converter Pro" 
+        Height="800" Width="1200"
+        WindowStartupLocation="CenterScreen"
+        MinHeight="600" MinWidth="800">
 
-        <Grid Grid.Column="0">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*" />
-                <RowDefinition Height="*" />
-            </Grid.RowDefinitions>
-            <TextBox x:Name="Input" Grid.Row="0" TextWrapping="Wrap" AcceptsReturn="True" />
-
-            <TextBox x:Name="Output" Grid.Row="1" TextWrapping="Wrap" AcceptsReturn="True" FontFamily="Courier New" />
-        </Grid>
-        <StackPanel Grid.Column="1" Orientation="Vertical">
+    <DockPanel LastChildFill="True">
+        <!-- Toolbar fissa in alto -->
+        <ToolBar DockPanel.Dock="Top" Padding="5" Background="#EEE">
+            <!-- Selezione Tipo di Conversione -->
             <StackPanel Orientation="Horizontal">
-                <Button Content="Facebook" Width="75" Margin="5" Click="FacebookButton_Click" />
-                <Button Content="Messenger" Width="75" Margin="5" Click="MessengerButton_Click" />
-                <Button Content="Instagram" Width="75" Margin="5" Click="InstagramButton_Click" />
-                <Button Content="Telegram" Width="75" Margin="5" Click="TelegramButton_Click" />
-                <Button Content="Evernote" Width="75" Margin="5" Click="EvernoteButton_Click" />
-                <Button Content="Io/Lei ciclico" Width="75" Margin="5" Click="IoLeiCiclico_Click" />
+                <Label Content="Tipo di Conversione:" VerticalAlignment="Center"/>
+                <ComboBox x:Name="ConversionTypeComboBox"
+                          Width="200"
+                          ToolTip="Seleziona il tipo di conversione"
+                          ItemsSource="{Binding ConversionTypes}"
+                          DisplayMemberPath="DisplayName"
+                          SelectedItem="{Binding SelectedConversionType}"
+                          Margin="5,0,0,0"/>
             </StackPanel>
-            <controls:RadGridView Name="debugGrid" AutoGenerateColumns="True" SelectionUnit="Mixed" SelectionMode="Extended" />
-        </StackPanel>
+            <Separator/>
+            <!-- Bottone Converti con icona FontAwesome -->
+            <Button Command="{Binding ConvertCommand}" Width="100" ToolTip="Avvia la conversione">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock FontFamily="FontAwesome" 
+                               Text="&#xf1ec;" 
+                               FontSize="16" 
+                               VerticalAlignment="Center"/>
+                    <TextBlock Text="Converti" 
+                               Margin="5,0,0,0" 
+                               VerticalAlignment="Center"/>
+                </StackPanel>
+            </Button>
+            <!-- Bottone Carica Esempio con icona FontAwesome -->
+            <Button Command="{Binding LoadSampleCommand}" Width="120" ToolTip="Carica un esempio" Margin="5,0,0,0">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock FontFamily="FontAwesome" 
+                               Text="&#xf040;" 
+                               FontSize="16" 
+                               VerticalAlignment="Center"/>
+                    <TextBlock Text="Carica Esempio" 
+                               Margin="5,0,0,0" 
+                               VerticalAlignment="Center"/>
+                </StackPanel>
+            </Button>
+            <!-- Toggle per il Debug Mode -->
+            <ToggleButton x:Name="DebugToggle"
+                          Content="Debug Mode"
+                          IsChecked="{Binding ShowDebug}"
+                          ToolTip="Abilita/disabilita la visualizzazione dei dati di debug"
+                          Margin="10,0,0,0"/>
+        </ToolBar>
 
-        <ListBox Grid.Column="1" Grid.Row="1" x:Name="Speakers"  HorizontalAlignment="Center" VerticalAlignment="Top" />
+        <!-- Status bar generale in basso -->
+        <StatusBar DockPanel.Dock="Bottom">
+            <TextBlock Text="Pronto"/>
+            <Separator/>
+            <TextBlock Text="{Binding InputTextLength}"/>
+            <TextBlock Text="caratteri"/>
+            <Separator/>
+            <TextBlock Text="{Binding OutputTextLength}"/>
+            <TextBlock Text="caratteri convertiti"/>
+        </StatusBar>
 
+        <!-- Layout principale: Grid con GridSplitter e pannello Debug racchiuso in un Expander -->
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="5"/>
+                <ColumnDefinition Width="3*"/>
+            </Grid.ColumnDefinitions>
 
-        <controls:RadGridView Grid.Row="1" Grid.Column="0" ItemsSource="{Binding Righe}" AutoGenerateColumns="True" SelectionUnit="Mixed" SelectionMode="Extended" />
-    </Grid>
+            <!-- Area Input/Output in TabControl (prima colonna) -->
+            <TabControl Grid.Column="0">
+                <TabItem Header="Input">
+                    <TextBox x:Name="InputTextBox"
+                             AcceptsReturn="True"
+                             TextWrapping="Wrap"
+                             FontFamily="Consolas"
+                             Padding="5"
+                             VerticalScrollBarVisibility="Auto"
+                             Text="{Binding InputText, UpdateSourceTrigger=PropertyChanged}"/>
+                </TabItem>
+                <TabItem Header="Output">
+                    <TextBox x:Name="OutputTextBox"
+                             IsReadOnly="True"
+                             TextWrapping="Wrap"
+                             FontFamily="Consolas"
+                             Padding="5"
+                             VerticalScrollBarVisibility="Auto"
+                             Text="{Binding OutputText}"/>
+                </TabItem>
+            </TabControl>
+
+            <!-- GridSplitter per ridimensionare le due aree -->
+            <GridSplitter Grid.Column="1"
+                          HorizontalAlignment="Stretch"
+                          VerticalAlignment="Stretch"
+                          Width="5"
+                          Background="Gray"
+                          ShowsPreview="True"
+                          Cursor="SizeWE"/>
+
+            <!-- Pannello Debug in un Expander (terza colonna) -->
+            <Expander Grid.Column="2" Header="Debug" IsExpanded="True"
+                      Visibility="{Binding ShowDebug, Converter={StaticResource BoolToVisibilityConverter}}">
+                <DockPanel>
+                    <TabControl DockPanel.Dock="Top">
+                        <TabItem Header="Regole Applicate">
+                            <telerik:RadGridView x:Name="RulesGrid"
+                                                 ItemsSource="{Binding AppliedRules}"
+                                                 AutoGenerateColumns="False"
+                                                 IsReadOnly="True">
+                                <telerik:RadGridView.Columns>
+                                    <telerik:GridViewDataColumn Header="Pattern" DataMemberBinding="{Binding From}"/>
+                                    <telerik:GridViewDataColumn Header="Sostituzione" DataMemberBinding="{Binding To}"/>
+                                    <telerik:GridViewDataColumn Header="Occorrenze" DataMemberBinding="{Binding Count}"/>
+                                </telerik:RadGridView.Columns>
+                            </telerik:RadGridView>
+                        </TabItem>
+                        <TabItem Header="Speaker">
+                            <ListBox x:Name="SpeakersList"
+                                     ItemsSource="{Binding Speakers}"
+                                     ScrollViewer.VerticalScrollBarVisibility="Auto"/>
+                        </TabItem>
+                    </TabControl>
+                    <!-- Barra di stato interna al pannello Debug -->
+                    <StatusBar DockPanel.Dock="Bottom" Margin="0,5,0,0">
+                        <TextBlock Text="{Binding ConversionStats}"/>
+                        <ProgressBar Width="200" Margin="10,0,0,0"
+                                     Value="{Binding ConversionProgress}"
+                                     Visibility="{Binding IsConverting, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                    </StatusBar>
+                </DockPanel>
+            </Expander>
+        </Grid>
+    </DockPanel>
 </Window>

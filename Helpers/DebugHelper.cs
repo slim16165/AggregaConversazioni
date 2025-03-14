@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text.RegularExpressions;
+using AggregaConversazioni.Models;
 using ConsoleTableExt;
 
-namespace AggregaConversazioni
+namespace AggregaConversazioni.Helpers
 {
     /// <summary>
     /// Provides helper methods for debugging with regex patterns.
@@ -27,44 +27,47 @@ namespace AggregaConversazioni
         /// <summary>
         /// Annotates a text with given source strings and their replacement values.
         /// </summary>
-        /// <param name="text1">The input text.</param>
+        /// <param name="text">The input text.</param>
         /// <param name="regexes">A list of source strings and their corresponding replacements.</param>
         /// <returns>The annotated text.</returns>
         public static string Annotate(string text, List<(string from, string to)> regexes)
         {
-            var annotatedString = CreateAnnotatedString(text, regexes);
-            
-            var uiData = PrepareAnnotationDataForUI(text, regexes);
-            MainWindow.RegexDebug = uiData;
-            MainWindow.debugGrid2.ItemsSource = uiData;
-
-            return annotatedString;
+            // Calcola e restituisce la stringa annotata
+            return CreateAnnotatedString(text, regexes);
         }
 
-        public static string CreateAnnotatedString(string text, List<(string from, string to)> regexes)
+        // Il metodo PrepareAnnotationDataForUI resta disponibile per essere usato
+        // dal ViewModel se necessario, ad esempio:
+        public static ObservableCollection<RegexDebugData> GetAnnotationData(string text, List<(string from, string to)> regexes)
+        {
+            return PrepareAnnotationDataForUI(text, regexes);
+        }
+
+
+        public static string CreateAnnotatedString(string text, List<(string from, string to)> replacementRules)
         {
             //Console.WriteLine("| from | to | sostituzioni |");
             //Console.WriteLine("|------|----|--------------|");
             //var enumerable = sostituzioni.Select(s => $"| {s.Source} | {s.Result} |");
 
-            var tableData = (
-                from reg in regexes
-                let replacementData = CalculateReplacement(text, reg)
-                select new List<object>
+            var tableData = replacementRules.Select(rule =>
+            {
+                var data = CalculateReplacement(text, rule);
+                return new List<object>
                 {
-                    Escape(reg.@from),
-                    Escape(reg.to),
-                    replacementData.count,
-                    replacementData.countDist,
-                }).ToList();
+                    Escape(rule.from),
+                    Escape(rule.to),
+                    data.count,
+                    data.countDist
+                };
+            }).ToList();
 
-            var tableRender =
-                ConsoleTableBuilder
-                    .From(tableData)
-                    .WithColumn("Regex from", "Regex to")
-                    .WithPaddingLeft(string.Empty)
-                    .WithFormat(ConsoleTableBuilderFormat.Default)
-                    .Export();
+            var tableRender = ConsoleTableBuilder
+                .From(tableData)
+                .WithColumn("Regex from", "Regex to")
+                .WithPaddingLeft(string.Empty)
+                .WithFormat(ConsoleTableBuilderFormat.Default)
+                .Export();
 
             return tableRender.ToString();
         }

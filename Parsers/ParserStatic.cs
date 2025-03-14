@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Text.RegularExpressions;
 
-namespace AggregaConversazioni.Parser
+namespace AggregaConversazioni.Parsers
 {
     internal static class ParserStatic
     {

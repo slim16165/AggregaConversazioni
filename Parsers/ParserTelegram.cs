@@ -1,11 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using AggregaConversazioni.Parser;
+using AggregaConversazioni.Models;
+using AggregaConversazioni.Utils;
 
-namespace AggregaConversazioni;
+namespace AggregaConversazioni.Parsers;
 
-class ParserTelegram : Parser.ParserBase
+class ParserTelegram : ParserBase
 {
     private static string ApplyRegex(ref string text, IEnumerable<string> lines)
     {

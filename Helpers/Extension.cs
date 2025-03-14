@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Text.RegularExpressions;
 
-namespace AggregaConversazioni;
+namespace AggregaConversazioni.Helpers;
 
 static class Extension
 {

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using AggregaConversazioni.Parser;
+using AggregaConversazioni.Models;
 
-namespace AggregaConversazioni;
+namespace AggregaConversazioni.Parsers;
 
 public class ParserIoLeiCiclico : ParserBase
 {

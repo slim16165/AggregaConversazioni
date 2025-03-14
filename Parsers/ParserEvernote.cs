@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using AggregaConversazioni.Parser;
+using AggregaConversazioni.Models;
 
-namespace AggregaConversazioni;
+namespace AggregaConversazioni.Parsers;
 
-class ParserEvernote : Parser.ParserBase
+class ParserEvernote : ParserBase
 {
     public static string AnalizzaEvernote(string text)
     {

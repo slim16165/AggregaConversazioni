@@ -1,4 +1,4 @@
-﻿namespace AggregaConversazioni;
+﻿namespace AggregaConversazioni.Models;
 
 /// <summary>
 /// Represents the details of a regex replacement operation.

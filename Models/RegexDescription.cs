@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
-namespace AggregaConversazioni;
+namespace AggregaConversazioni.Models;
 
 public enum RegexCategory
 {

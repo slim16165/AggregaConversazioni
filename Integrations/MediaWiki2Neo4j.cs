@@ -4,7 +4,7 @@ using System.Collections.Specialized;
 using System.Text.RegularExpressions;
 using Neo4j.Driver;
 
-namespace AggregaConversazioni.Parser;
+namespace AggregaConversazioni.Integrations;
 
 internal class SemanticLink
 {

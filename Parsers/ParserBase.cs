@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using AggregaConversazioni.Helpers;
+using AggregaConversazioni.Models;
 
-namespace AggregaConversazioni.Parser;
+namespace AggregaConversazioni.Parsers;
 
-public abstract class ParserBase
+public abstract class ParserBase : ITextTransformer
 {
     protected ParserContext Context { get; } = new ParserContext();
 
@@ -85,5 +87,10 @@ public abstract class ParserBase
     protected virtual void ApplyPostProcessingPatterns()
     {
         //...
+    }
+
+    public string Transform(string input)
+    {
+        throw new NotImplementedException();
     }
 }

@@ -1,11 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using AggregaConversazioni.Parser;
+using AggregaConversazioni.Models;
+using AggregaConversazioni.Utils;
 
-namespace AggregaConversazioni;
+namespace AggregaConversazioni.Parsers;
 
-class ParserInstagram : Parser.ParserBase
+class ParserInstagram : ParserBase
 {
     protected static string ApplyRegex(ref string text, string speaker)
     {

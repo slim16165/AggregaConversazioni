@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using AggregaConversazioni.Parser;
+using AggregaConversazioni.Models;
+using AggregaConversazioni.Utils;
 
-namespace AggregaConversazioni;
+namespace AggregaConversazioni.Parsers;
 
 public class ParserContext
 {
