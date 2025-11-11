@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: aggrega-conversazioni-api
+  labels:
+    app: aggrega-conversazioni-api
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: aggrega-conversazioni-api
+  template:
+    metadata:
+      labels:
+        app: aggrega-conversazioni-api
+    spec:
+      containers:
+      - name: api
+        image: aggrega-conversazioni/api:latest
+        ports:
+        - containerPort: 80
+        env:
+        - name: ConnectionStrings__PostgreSQL
+          valueFrom:
+            secretKeyRef:
+              name: db-secrets
+              key: postgres-connection
+        - name: ConnectionStrings__Neo4j
+          valueFrom:
+            secretKeyRef:
+              name: db-secrets
+              key: neo4j-connection
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 80
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 80
+          initialDelaySeconds: 10
+          periodSeconds: 5
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: aggrega-conversazioni-api
+spec:
+  selector:
+    app: aggrega-conversazioni-api
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
+  type: LoadBalancer
